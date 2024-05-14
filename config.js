@@ -1,16 +1,17 @@
-const firebase = require("firebase");
+const firebase = require("firebase/app");
+require("firebase/firestore");
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCJpuZdn5dXqbUYdybDLsbGEv9yptdQ4kU",
-  authDomain: "petterinary-d36f0.firebaseapp.com",
-  projectId: "petterinary-d36f0",
-  storageBucket: "petterinary-d36f0.appspot.com",
-  messagingSenderId: "821654324244",
-  appId: "1:821654324244:web:a131b32e3d5da3d7aad301",
-  measurementId: "G-WJ98JRG696"
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
 };
 
 firebase.initializeApp(firebaseConfig);
+
 const db = firebase.firestore();
 
 module.exports = db;
