@@ -1,69 +1,114 @@
-const db = require("../config");
+const db = require("../firebaseAdmin");
 
 const UserRead = {
   getAllUsers: async () => {
     try {
-      const snapshot = await db.collection("Users").get();
-      const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const snapshot = await db.collection("Users").where("visible", "==", 1).orderBy("userId", "asc").get();
+      const list = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          userId: data.userId || null,
+          name: data.name || "",
+          phoneNumber: data.phoneNumber || "",
+          address: data.address || "",
+          email: data.email || "",
+          visible: data.visible || 1,
+        };
+      });
       return list;
     } catch (error) {
-      throw new Error("Failed to fetch users");
+      throw new Error("Failed to fetch users: " + error.message);
     }
   },
   getUserById: async (userID) => {
     try {
-      const doc = await db.collection("Users").doc(userID).get();
-      if (!doc.exists) {
+      const querySnapshot = await db.collection("Users").where("userId", "==", parseInt(userID)).where("visible", "==", 1).get();
+      if (querySnapshot.empty) {
         throw new Error("User not found");
       }
-      return { id: doc.id, ...doc.data() };
+      const doc = querySnapshot.docs[0];
+      const data = doc.data();
+      return {
+        userId: data.userId || null,
+        name: data.name || "",
+        phoneNumber: data.phoneNumber || "",
+        address: data.address || "",
+        email: data.email || "",
+        visible: data.visible || 1,
+      };
     } catch (error) {
-      throw new Error("Failed to fetch user");
+      throw new Error("Failed to fetch User");
     }
   },
 };
 
 const UserWrite = {
-  createUser: async ({ name, phoneNumber, address, email = "" }) => {
+  createUser: async ({ name, phoneNumber, address, email = ""}) => {
     try {
-      const docRef = await db.collection("Users").add({
+      const counterRef = db.collection("UserCounter").doc("userCounter");
+      const counterDoc = await counterRef.get();
+
+      let newCount;
+      if (!counterDoc.exists) {
+        await counterRef.set({ count: 1 });
+        newCount = 1;
+      } else {
+        const currentCount = counterDoc.data().count || 0;
+        newCount = currentCount + 1;
+        await counterRef.update({ count: newCount });
+      }
+
+      const newUserRef = db.collection("Users").doc();
+      const newUserData = {
+        userId: newCount,
         name,
         phoneNumber,
         address,
         email,
-      });
+        visible: 1,
+      };
 
-      const doc = await docRef.get();
-      if (!doc.exists) {
-        throw new Error("Failed to create user");
-      }
+      await newUserRef.set(newUserData);
 
-      return { id: doc.id, ...doc.data() };
+      return {
+        userId: newCount,
+        ...newUserData
+      };
     } catch (error) {
-      throw new Error("Failed to create user");
+      throw new Error("Failed to create user: " + error.message);
     }
   },
 
   updateUserById: async (userID, newData) => {
     try {
-      await db.collection("Users").doc(userID).update(newData);
+      const querySnapshot = await db.collection("Users").where("userId", "==", parseInt(userID)).get();
+      if (querySnapshot.empty) {
+        throw new Error("User not found");
+      }
+      const doc = querySnapshot.docs[0];
+      await db.collection("Users").doc(doc.id).update(newData);
       return { msg: "User updated" };
     } catch (error) {
-      throw new Error("Failed to update user");
+      throw new Error("Failed to update user: " + error.message);
     }
   },
 
   deleteUserById: async (userID) => {
     try {
-      await db.collection("Users").doc(userID).delete();
-      return { msg: "User deleted" };
+      const querySnapshot = await db.collection("Users").where("userId", "==", parseInt(userID)).get();
+      if (querySnapshot.empty) {
+        throw new Error("User not found");
+      }
+      const doc = querySnapshot.docs[0];
+      await db.collection("Users").doc(doc.id).update({ visible: 0 }); // Update visibility to 0 instead of deleting
+      return { msg: "User hidden" };
     } catch (error) {
-      throw new Error("Failed to delete user");
+      throw new Error("Failed to hide user: " + error.message);
     }
   },
 };
 
 module.exports = {
-    UserRead,
-    UserWrite
+  UserRead,
+  UserWrite
 };
