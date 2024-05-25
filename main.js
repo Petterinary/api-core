@@ -1,4 +1,4 @@
-require('dotenv').config(); // Load environment variables
+require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
@@ -8,9 +8,11 @@ app.use(cors());
 
 const userRoutes = require('./routes/user');
 const doctorRoutes = require('./routes/doctor');
+const serviceRegistrationFormRoutes = require('./routes/serviceRegistrationForm');
 
 app.use('/users', userRoutes);
 app.use('/doctors', doctorRoutes);
+app.use('/serviceRegistrationForms', serviceRegistrationFormRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
