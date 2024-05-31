@@ -9,10 +9,12 @@ app.use(cors());
 const userRoutes = require('./routes/user');
 const doctorRoutes = require('./routes/doctor');
 const serviceRegistrationFormRoutes = require('./routes/serviceRegistrationForm');
+const paymentsRoutes = require('./routes/payment');
 
 app.use('/users', userRoutes);
 app.use('/doctors', doctorRoutes);
 app.use('/serviceRegistrationForms', serviceRegistrationFormRoutes);
+app.use('/payments', paymentsRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
