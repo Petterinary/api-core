@@ -33,6 +33,21 @@ const getAccountById = async (req, res) => {
   }
 };
 
+const getAccountByUid = async (req, res) => {
+  const { uid } = req.params;
+  try {
+    const account = await Account.AccountRead.getAccountByUid(uid);
+    const convertedAccount = {
+      ...account,
+      createdAt: account.createdAt ? convertToIndonesianTime(account.createdAt) : null,
+      updatedAt: account.updatedAt ? convertToIndonesianTime(account.updatedAt) : null,
+    };
+    res.json(convertedAccount);
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+};
+
 const createAccount = async (req, res) => {
   const { email, username, address, phoneNumber, userType, uid } = req.body;
   if (!email || !username || !address || !phoneNumber || !userType || !uid) {
@@ -82,6 +97,7 @@ const deleteAccountById = async (req, res) => {
 module.exports = {
   getAllAccounts,
   getAccountById,
+  getAccountByUid,
   createAccount,
   updateAccountById,
   deleteAccountById,

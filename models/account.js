@@ -49,6 +49,31 @@ const AccountRead = {
       throw new Error("Failed to fetch account: " + error.message);
     }
   },
+
+  getAccountByUid: async (uid) => {
+    try {
+      const querySnapshot = await db.collection("Accounts").where("uid", "==", uid).get();
+      if (querySnapshot.empty) {
+        throw new Error("Account not found");
+      }
+      const doc = querySnapshot.docs[0];
+      const data = doc.data();
+
+      return {
+        accountId: data.accountId || null,
+        email: data.email || "",
+        username: data.username || "",
+        address: data.address || "",
+        phoneNumber: data.phoneNumber || "",
+        userType: data.userType || "",
+        uid: data.uid || "",
+        createdAt: data.createdAt ? data.createdAt.toDate() : null,
+        updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
+      };
+    } catch (error) {
+      throw new Error("Failed to fetch account: " + error.message);
+    }
+  },
 };
 
 const AccountWrite = {
