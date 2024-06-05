@@ -1,113 +1,131 @@
-const { db, auth } = require('../firebaseAdmin');
+const db = require("../firebaseAdmin");
+const { FieldValue } = require("firebase-admin/firestore");
 
-const AccountModel = {
-  createAccount: async ({ email, password, username, address, phoneNumber, userType }) => {
+const AccountRead = {
+  getAllAccounts: async () => {
     try {
-      // Create user in Firebase Authentication
-      const userRecord = await auth.createUser({
-        email,
-        password,
-        displayName: username,
+      const snapshot = await db.collection("Accounts").orderBy("accountId", "asc").get();
+      const list = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          accountId: data.accountId || null,
+          email: data.email || "",
+          username: data.username || "",
+          address: data.address || "",
+          phoneNumber: data.phoneNumber || "",
+          userType: data.userType || "",
+          uid: data.uid || "",
+          createdAt: data.createdAt ? data.createdAt.toDate() : null,
+          updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
+        };
       });
-
-      const uid = userRecord.uid;
-
-      // Incremental accountId logic
-      const counterRef = db.collection("AccountCounter").doc("accountCounter");
-      const counterDoc = await counterRef.get();
-
-      let newAccountId;
-      if (!counterDoc.exists) {
-        await counterRef.set({ count: 1 });
-        newAccountId = 1;
-      } else {
-        const currentCount = counterDoc.data().count || 0;
-        newAccountId = currentCount + 1;
-        await counterRef.update({ count: newAccountId });
-      }
-
-      // Add account data to Firestore
-      const accountData = {
-        accountId: newAccountId,
-        email,
-        username,
-        address,
-        phoneNumber,
-        userType,
-        uid, // Store the User UID from Firebase Authentication
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      };
-
-      await db.collection('Accounts').doc(String(newAccountId)).set(accountData);
-
-      // Add user data to Users collection
-      const userData = {
-        userId: newAccountId,
-        name: username,
-        address,
-        phoneNumber,
-        email,
-        visible: 1
-      };
-
-      await db.collection('Users').doc(String(newAccountId)).set(userData);
-
-      return accountData;
+      return list;
     } catch (error) {
-      throw new Error('Failed to create account: ' + error.message);
+      throw new Error("Failed to fetch accounts: " + error.message);
     }
   },
 
   getAccountById: async (accountId) => {
     try {
-      const doc = await db.collection('Accounts').doc(String(accountId)).get();
-      if (!doc.exists) {
-        throw new Error('Account not found');
+      const querySnapshot = await db.collection("Accounts").where("accountId", "==", parseInt(accountId)).get();
+      if (querySnapshot.empty) {
+        throw new Error("Account not found");
       }
-      return doc.data();
+      const doc = querySnapshot.docs[0];
+      const data = doc.data();
+
+      return {
+        accountId: data.accountId || null,
+        email: data.email || "",
+        username: data.username || "",
+        address: data.address || "",
+        phoneNumber: data.phoneNumber || "",
+        userType: data.userType || "",
+        uid: data.uid || "",
+        createdAt: data.createdAt ? data.createdAt.toDate() : null,
+        updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
+      };
     } catch (error) {
-      throw new Error('Failed to fetch account: ' + error.message);
+      throw new Error("Failed to fetch account: " + error.message);
+    }
+  },
+};
+
+const AccountWrite = {
+  createAccount: async ({ email, username, address, phoneNumber, userType, uid }) => {
+    try {
+      const counterRef = db.collection("AccountCounter").doc("accountCounter");
+      const counterDoc = await counterRef.get();
+
+      let newCount;
+      if (!counterDoc.exists) {
+        await counterRef.set({ count: 1 });
+        newCount = 1;
+      } else {
+        const currentCount = counterDoc.data().count || 0;
+        newCount = currentCount + 1;
+        await counterRef.update({ count: newCount });
+      }
+
+      const newAccountRef = db.collection("Accounts").doc();
+      const newAccountData = {
+        accountId: newCount,
+        email,
+        username,
+        address,
+        phoneNumber,
+        userType,
+        uid,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      };
+
+      await newAccountRef.set(newAccountData);
+
+      return {
+        accountId: newCount,
+        ...newAccountData,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+    } catch (error) {
+      throw new Error("Failed to create account: " + error.message);
     }
   },
 
   updateAccountById: async (accountId, newData) => {
     try {
-      const accountRef = db.collection('Accounts').doc(String(accountId));
-      const doc = await accountRef.get();
-      if (!doc.exists) {
-        throw new Error('Account not found');
+      const querySnapshot = await db.collection("Accounts").where("accountId", "==", parseInt(accountId)).get();
+      if (querySnapshot.empty) {
+        throw new Error("Account not found");
       }
-      newData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
-      await accountRef.update(newData);
+      const doc = querySnapshot.docs[0];
+
+      newData.updatedAt = FieldValue.serverTimestamp();
+
+      await db.collection("Accounts").doc(doc.id).update(newData);
       return { msg: "Account updated" };
     } catch (error) {
-      throw new Error('Failed to update account: ' + error.message);
+      throw new Error("Failed to update account: " + error.message);
     }
   },
 
   deleteAccountById: async (accountId) => {
     try {
-      const accountRef = db.collection('Accounts').doc(String(accountId));
-      const doc = await accountRef.get();
-      if (!doc.exists) {
-        throw new Error('Account not found');
+      const querySnapshot = await db.collection("Accounts").where("accountId", "==", parseInt(accountId)).get();
+      if (querySnapshot.empty) {
+        throw new Error("Account not found");
       }
-      await accountRef.delete();
+      const doc = querySnapshot.docs[0];
+      await db.collection("Accounts").doc(doc.id).delete();
       return { msg: "Account deleted" };
     } catch (error) {
-      throw new Error('Failed to delete account: ' + error.message);
+      throw new Error("Failed to delete account: " + error.message);
     }
   },
-
-  getAllAccounts: async () => {
-    try {
-      const snapshot = await db.collection("Accounts").orderBy("accountId", "asc").get();
-      return snapshot.docs.map(doc => doc.data());
-    } catch (error) {
-      throw new Error("Failed to fetch accounts: " + error.message);
-    }
-  }
 };
 
-module.exports = AccountModel;
+module.exports = {
+  AccountRead,
+  AccountWrite,
+};
