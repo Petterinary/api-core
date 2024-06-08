@@ -33,6 +33,16 @@ const getAccountById = async (req, res) => {
   }
 };
 
+const getDoctorById = async (req, res) => {
+  const { doctorId } = req.params;
+  try {
+    const doctor = await Account.AccountRead.getDoctorById(doctorId);
+    res.json(doctor);
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+};
+
 const getAccountByUid = async (req, res) => {
   const { uid } = req.params;
   try {
@@ -73,6 +83,34 @@ const createAccount = async (req, res) => {
   }
 };
 
+const createDoctorAccount = async (req, res) => {
+  const { email, username, address, phoneNumber, userType, uid, doctorSchedule, experience, specialization } = req.body;
+  if (!email || !username || !address || !phoneNumber || !userType || !uid || !doctorSchedule || !experience || !specialization) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+  try {
+    const newDoctorAccount = await Account.AccountWrite.createDoctorAccount({
+      email,
+      username,
+      address,
+      phoneNumber,
+      userType,
+      uid,
+      doctorSchedule,
+      experience,
+      specialization,
+    });
+    const convertedDoctorAccount = {
+      ...newDoctorAccount,
+      createdAt: newDoctorAccount.createdAt ? convertToIndonesianTime(newDoctorAccount.createdAt) : null,
+      updatedAt: newDoctorAccount.updatedAt ? convertToIndonesianTime(newDoctorAccount.updatedAt) : null,
+    };
+    res.status(201).json(convertedDoctorAccount);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const updateAccountById = async (req, res) => {
   const { accountId } = req.params;
   const newData = req.body;
@@ -97,8 +135,10 @@ const deleteAccountById = async (req, res) => {
 module.exports = {
   getAllAccounts,
   getAccountById,
+  getDoctorById,
   getAccountByUid,
   createAccount,
+  createDoctorAccount,
   updateAccountById,
   deleteAccountById,
 };

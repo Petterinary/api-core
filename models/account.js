@@ -50,6 +50,29 @@ const AccountRead = {
     }
   },
 
+  getDoctorById: async (doctorId) => {
+    try {
+      const querySnapshot = await db.collection("Doctors").where("doctorId", "==", parseInt(doctorId)).get();
+      if (querySnapshot.empty) {
+        throw new Error("Doctor not found");
+      }
+      const doc = querySnapshot.docs[0];
+      const data = doc.data();
+      return {
+        doctorId: data.doctorId || null,
+        name: data.name || "",
+        address: data.address || "",
+        email: data.email || "",
+        phoneNumber: data.phoneNumber || "",
+        specialization: data.specialization || "",
+        doctorSchedule: data.doctorSchedule || "",
+        experience: data.experience || "",
+      };
+    } catch (error) {
+      throw new Error("Failed to fetch doctor: " + error.message);
+    }
+  },
+
   getAccountByUid: async (uid) => {
     try {
       const querySnapshot = await db.collection("Accounts").where("uid", "==", uid).get();
@@ -115,6 +138,86 @@ const AccountWrite = {
       };
     } catch (error) {
       throw new Error("Failed to create account: " + error.message);
+    }
+  },
+
+  createDoctorAccount: async ({ email, username, address, phoneNumber, userType, uid, doctorSchedule, experience, specialization }) => {
+    try {
+      const accountCounterRef = db.collection("AccountCounter").doc("accountCounter");
+      const accountCounterDoc = await accountCounterRef.get();
+
+      let newAccountId;
+      if (!accountCounterDoc.exists) {
+        await accountCounterRef.set({ count: 1 });
+        newAccountId = 1;
+      } else {
+        const currentCount = accountCounterDoc.data().count || 0;
+        newAccountId = currentCount + 1;
+        await accountCounterRef.update({ count: newAccountId });
+      }
+
+      const doctorCounterRef = db.collection("DoctorCounter").doc("doctorCounter");
+      const doctorCounterDoc = await doctorCounterRef.get();
+
+      let newDoctorId;
+      if (!doctorCounterDoc.exists) {
+        await doctorCounterRef.set({ count: 1 });
+        newDoctorId = 1;
+      } else {
+        const currentCount = doctorCounterDoc.data().count || 0;
+        newDoctorId = currentCount + 1;
+        await doctorCounterRef.update({ count: newDoctorId });
+      }
+
+      const newAccountRef = db.collection("Accounts").doc();
+      const newAccountData = {
+        accountId: newAccountId,
+        email,
+        username,
+        address,
+        phoneNumber,
+        userType,
+        uid,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+        doctorId: newDoctorId,
+      };
+
+      const newDoctorRef = db.collection("Doctors").doc();
+      const newDoctorData = {
+        doctorId: newDoctorId,
+        name: username,
+        address,
+        email,
+        phoneNumber,
+        specialization,
+        doctorSchedule,
+        experience,
+        visible: 1,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      };
+
+      await newAccountRef.set(newAccountData);
+      await newDoctorRef.set(newDoctorData);
+
+      return {
+        accountId: newAccountId,
+        doctorId: newDoctorId,
+        email,
+        username,
+        address,
+        phoneNumber,
+        userType,
+        uid,
+        doctorSchedule,
+        experience,
+        specialization,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+    } catch (error) {
+      throw new Error("Failed to create doctor account: " + error.message);
     }
   },
 
