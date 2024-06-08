@@ -100,7 +100,7 @@ const AccountRead = {
 };
 
 const AccountWrite = {
-  createAccount: async ({ email, username, address, phoneNumber, userType, uid }) => {
+  createAccount: async ({ email, username, address, phoneNumber, userType, uid, gender }) => {
     try {
       const counterRef = db.collection("AccountCounter").doc("accountCounter");
       const counterDoc = await counterRef.get();
@@ -124,6 +124,7 @@ const AccountWrite = {
         phoneNumber,
         userType,
         uid,
+        gender,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       };
@@ -141,7 +142,7 @@ const AccountWrite = {
     }
   },
 
-  createDoctorAccount: async ({ email, username, address, phoneNumber, userType, uid, doctorSchedule, experience, specialization }) => {
+  createDoctorAccount: async ({ email, username, address, phoneNumber, userType, uid, doctorSchedule, experience, specialization, gender }) => {
     try {
       const accountCounterRef = db.collection("AccountCounter").doc("accountCounter");
       const accountCounterDoc = await accountCounterRef.get();
@@ -178,6 +179,7 @@ const AccountWrite = {
         phoneNumber,
         userType,
         uid,
+        gender,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
         doctorId: newDoctorId,
@@ -193,6 +195,7 @@ const AccountWrite = {
         specialization,
         doctorSchedule,
         experience,
+        gender,
         visible: 1,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
@@ -213,6 +216,7 @@ const AccountWrite = {
         doctorSchedule,
         experience,
         specialization,
+        gender,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
