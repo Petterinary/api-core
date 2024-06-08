@@ -59,8 +59,8 @@ const getAccountByUid = async (req, res) => {
 };
 
 const createAccount = async (req, res) => {
-  const { email, username, address, phoneNumber, userType, uid } = req.body;
-  if (!email || !username || !address || !phoneNumber || !userType || !uid) {
+  const { email, username, address, phoneNumber, userType, uid, gender } = req.body;
+  if (!email || !username || !address || !phoneNumber || !userType || !uid || !gender) {
     return res.status(400).json({ error: "Missing required fields" });
   }
   try {
@@ -71,6 +71,7 @@ const createAccount = async (req, res) => {
       phoneNumber,
       userType,
       uid,
+      gender,
     });
     const convertedAccount = {
       ...newAccount,
@@ -84,8 +85,8 @@ const createAccount = async (req, res) => {
 };
 
 const createDoctorAccount = async (req, res) => {
-  const { email, username, address, phoneNumber, userType, uid, doctorSchedule, experience, specialization } = req.body;
-  if (!email || !username || !address || !phoneNumber || !userType || !uid || !doctorSchedule || !experience || !specialization) {
+  const { email, username, address, phoneNumber, userType, uid, doctorSchedule, experience, specialization, gender } = req.body;
+  if (!email || !username || !address || !phoneNumber || !userType || !uid || !doctorSchedule || !experience || !specialization || !gender) {
     return res.status(400).json({ error: "Missing required fields" });
   }
   try {
@@ -99,6 +100,7 @@ const createDoctorAccount = async (req, res) => {
       doctorSchedule,
       experience,
       specialization,
+      gender,
     });
     const convertedDoctorAccount = {
       ...newDoctorAccount,

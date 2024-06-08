@@ -4,42 +4,53 @@ const DoctorRead = {
   getAllDoctors: async () => {
     try {
       const snapshot = await db.collection("Doctors").where("visible", "==", 1).orderBy("doctorId", "asc").get();
-      const list = snapshot.docs.map((doc) => {
+      const list = await Promise.all(snapshot.docs.map(async (doc) => {
         const data = doc.data();
+        const accountSnapshot = await db.collection("Accounts").where("doctorId", "==", data.doctorId).get();
+        const accountData = accountSnapshot.empty ? {} : accountSnapshot.docs[0].data();
         return {
           doctorId: data.doctorId || null,
-          name: data.name || "",
+          name: accountData.username || data.name || "",
           phoneNumber: data.phoneNumber || "",
           address: data.address || "",
           email: data.email || "",
           specialization: data.specialization || "",
+          doctorSchedule: accountData.doctorSchedule || "",
+          experience: accountData.experience || "",
+          gender: accountData.gender || "",
           visible: data.visible || 1,
         };
-      });
+      }));
       return list;
     } catch (error) {
       throw new Error("Failed to fetch doctors: " + error.message);
     }
   },
-  getDoctorById: async (doctorID) => {
+
+  getDoctorById: async (doctorId) => {
     try {
-      const querySnapshot = await db.collection("Doctors").where("doctorId", "==", parseInt(doctorID)).where("visible", "==", 1).get();
+      const querySnapshot = await db.collection("Doctors").where("doctorId", "==", parseInt(doctorId)).where("visible", "==", 1).get();
       if (querySnapshot.empty) {
         throw new Error("Doctor not found");
       }
       const doc = querySnapshot.docs[0];
       const data = doc.data();
+      const accountSnapshot = await db.collection("Accounts").where("doctorId", "==", data.doctorId).get();
+      const accountData = accountSnapshot.empty ? {} : accountSnapshot.docs[0].data();
       return {
         doctorId: data.doctorId || null,
-        name: data.name || "",
+        name: accountData.username || data.name || "",
         phoneNumber: data.phoneNumber || "",
         address: data.address || "",
         email: data.email || "",
         specialization: data.specialization || "",
+        doctorSchedule: accountData.doctorSchedule || "",
+        experience: accountData.experience || "",
+        gender: accountData.gender || "",
         visible: data.visible || 1,
       };
     } catch (error) {
-      throw new Error("Failed to fetch doctor");
+      throw new Error("Failed to fetch doctor: " + error.message);
     }
   },
 };
