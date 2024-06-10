@@ -20,9 +20,25 @@ const getUserById = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  const { name, phoneNumber, address, email = "", specialization = "" } = req.body;
+  const {
+    name,
+    phoneNumber,
+    address,
+    email = "",
+    specialization = "",
+    lat,
+    lng,
+  } = req.body;
   try {
-    const newUser = await User.UserWrite.createUser({ name, phoneNumber, address, email, specialization });
+    const newUser = await User.UserWrite.createUser({
+      name,
+      phoneNumber,
+      address,
+      email,
+      specialization,
+      lat,
+      lng,
+    });
     res.status(201).json(newUser);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -31,9 +47,25 @@ const createUser = async (req, res) => {
 
 const updateUserById = async (req, res) => {
   const { userID } = req.params;
-  const { name, phoneNumber, address, email = "", specialization = "" } = req.body;
+  const {
+    name,
+    phoneNumber,
+    address,
+    email = "",
+    specialization = "",
+    lat,
+    lng,
+  } = req.body;
   try {
-    const updatedUser = await User.UserWrite.updateUserById(userID, { name, phoneNumber, address, email, specialization });
+    const updatedUser = await User.UserWrite.updateUserById(userID, {
+      name,
+      phoneNumber,
+      address,
+      email,
+      specialization,
+      lat,
+      lng,
+    });
     res.json(updatedUser);
   } catch (error) {
     res.status(500).json({ error: error.message });
