@@ -6,17 +6,19 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const userRoutes = require('./routes/user');
-const doctorRoutes = require('./routes/doctor');
-const serviceRegistrationFormRoutes = require('./routes/serviceRegistrationForm');
-const paymentsRoutes = require('./routes/payment');
 const accountsRoutes = require('./routes/account');
+const consultationStageRoutes = require("./routes/consultationStage");
+const doctorRoutes = require('./routes/doctor');
+const paymentsRoutes = require('./routes/payment');
+const serviceRegistrationFormRoutes = require('./routes/serviceRegistrationForm');
+const userRoutes = require('./routes/user');
 
-app.use('/users', userRoutes);
-app.use('/doctors', doctorRoutes);
-app.use('/serviceRegistrationForms', serviceRegistrationFormRoutes);
-app.use('/payments', paymentsRoutes);
 app.use('/accounts', accountsRoutes);
+app.use('/consultationStages', consultationStageRoutes);
+app.use('/doctors', doctorRoutes);
+app.use('/payments', paymentsRoutes);
+app.use('/serviceRegistrationForms', serviceRegistrationFormRoutes);
+app.use('/users', userRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
