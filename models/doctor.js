@@ -3,24 +3,37 @@ const db = require("../firebaseAdmin");
 const DoctorRead = {
   getAllDoctors: async () => {
     try {
-      const snapshot = await db.collection("Doctors").where("visible", "==", 1).orderBy("doctorId", "asc").get();
-      const list = await Promise.all(snapshot.docs.map(async (doc) => {
-        const data = doc.data();
-        const accountSnapshot = await db.collection("Accounts").where("doctorId", "==", data.doctorId).get();
-        const accountData = accountSnapshot.empty ? {} : accountSnapshot.docs[0].data();
-        return {
-          doctorId: data.doctorId || null,
-          name: accountData.username || data.name || "",
-          phoneNumber: data.phoneNumber || "",
-          address: data.address || "",
-          email: data.email || "",
-          specialization: data.specialization || "",
-          doctorSchedule: accountData.doctorSchedule || "",
-          experience: accountData.experience || "",
-          gender: accountData.gender || "",
-          visible: data.visible || 1,
-        };
-      }));
+      const snapshot = await db
+        .collection("Doctors")
+        .where("visible", "==", 1)
+        .orderBy("doctorId", "asc")
+        .get();
+      const list = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const data = doc.data();
+          const accountSnapshot = await db
+            .collection("Accounts")
+            .where("doctorId", "==", data.doctorId)
+            .get();
+          const accountData = accountSnapshot.empty
+            ? {}
+            : accountSnapshot.docs[0].data();
+          return {
+            doctorId: data.doctorId || null,
+            name: accountData.username || data.name || "",
+            phoneNumber: data.phoneNumber || "",
+            address: data.address || "",
+            email: data.email || "",
+            specialization: data.specialization || "",
+            doctorSchedule: accountData.doctorSchedule || "",
+            experience: accountData.experience || "",
+            gender: accountData.gender || "",
+            lat: accountData.lat || "",
+            lng: accountData.lng || "",
+            visible: data.visible || 1,
+          };
+        })
+      );
       return list;
     } catch (error) {
       throw new Error("Failed to fetch doctors: " + error.message);
@@ -29,14 +42,23 @@ const DoctorRead = {
 
   getDoctorById: async (doctorId) => {
     try {
-      const querySnapshot = await db.collection("Doctors").where("doctorId", "==", parseInt(doctorId)).where("visible", "==", 1).get();
+      const querySnapshot = await db
+        .collection("Doctors")
+        .where("doctorId", "==", parseInt(doctorId))
+        .where("visible", "==", 1)
+        .get();
       if (querySnapshot.empty) {
         throw new Error("Doctor not found");
       }
       const doc = querySnapshot.docs[0];
       const data = doc.data();
-      const accountSnapshot = await db.collection("Accounts").where("doctorId", "==", data.doctorId).get();
-      const accountData = accountSnapshot.empty ? {} : accountSnapshot.docs[0].data();
+      const accountSnapshot = await db
+        .collection("Accounts")
+        .where("doctorId", "==", data.doctorId)
+        .get();
+      const accountData = accountSnapshot.empty
+        ? {}
+        : accountSnapshot.docs[0].data();
       return {
         doctorId: data.doctorId || null,
         name: accountData.username || data.name || "",
@@ -47,6 +69,8 @@ const DoctorRead = {
         doctorSchedule: accountData.doctorSchedule || "",
         experience: accountData.experience || "",
         gender: accountData.gender || "",
+        lat: accountData.lat || "",
+        lng: accountData.lng || "",
         visible: data.visible || 1,
       };
     } catch (error) {
@@ -56,7 +80,15 @@ const DoctorRead = {
 };
 
 const DoctorWrite = {
-  createDoctor: async ({ name, phoneNumber, address, email = "", specialization = "" }) => {
+  createDoctor: async ({
+    name,
+    phoneNumber,
+    address,
+    email = "",
+    specialization = "",
+    lat,
+    lng,
+  }) => {
     try {
       const counterRef = db.collection("DoctorCounter").doc("doctorCounter");
       const counterDoc = await counterRef.get();
@@ -79,6 +111,8 @@ const DoctorWrite = {
         address,
         email,
         specialization,
+        lat,
+        lng,
         visible: 1, // Set visibility to 1 for new doctors
       };
 
@@ -86,7 +120,7 @@ const DoctorWrite = {
 
       return {
         doctorId: newCount,
-        ...newDoctorData
+        ...newDoctorData,
       };
     } catch (error) {
       throw new Error("Failed to create doctor: " + error.message);
@@ -95,7 +129,10 @@ const DoctorWrite = {
 
   updateDoctorById: async (doctorID, newData) => {
     try {
-      const querySnapshot = await db.collection("Doctors").where("doctorId", "==", parseInt(doctorID)).get();
+      const querySnapshot = await db
+        .collection("Doctors")
+        .where("doctorId", "==", parseInt(doctorID))
+        .get();
       if (querySnapshot.empty) {
         throw new Error("Doctor not found");
       }
@@ -109,7 +146,10 @@ const DoctorWrite = {
 
   deleteDoctorById: async (doctorID) => {
     try {
-      const querySnapshot = await db.collection("Doctors").where("doctorId", "==", parseInt(doctorID)).get();
+      const querySnapshot = await db
+        .collection("Doctors")
+        .where("doctorId", "==", parseInt(doctorID))
+        .get();
       if (querySnapshot.empty) {
         throw new Error("Doctor not found");
       }
@@ -124,5 +164,5 @@ const DoctorWrite = {
 
 module.exports = {
   DoctorRead,
-  DoctorWrite
+  DoctorWrite,
 };

@@ -20,9 +20,25 @@ const getDoctorById = async (req, res) => {
 };
 
 const createDoctor = async (req, res) => {
-  const { name, phoneNumber, address, email = "", specialization = "" } = req.body;
+  const {
+    name,
+    phoneNumber,
+    address,
+    email = "",
+    specialization = "",
+    lat,
+    lng,
+  } = req.body;
   try {
-    const newDoctor = await Doctor.DoctorWrite.createDoctor({ name, phoneNumber, address, email, specialization });
+    const newDoctor = await Doctor.DoctorWrite.createDoctor({
+      name,
+      phoneNumber,
+      address,
+      email,
+      specialization,
+      lat,
+      lng,
+    });
     res.status(201).json(newDoctor);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -31,9 +47,25 @@ const createDoctor = async (req, res) => {
 
 const updateDoctorById = async (req, res) => {
   const { doctorID } = req.params;
-  const { name, phoneNumber, address, email = "", specialization = "" } = req.body;
+  const {
+    name,
+    phoneNumber,
+    address,
+    email = "",
+    specialization = "",
+    lat,
+    lng,
+  } = req.body;
   try {
-    const updatedDoctor = await Doctor.DoctorWrite.updateDoctorById(doctorID, { name, phoneNumber, address, email, specialization });
+    const updatedDoctor = await Doctor.DoctorWrite.updateDoctorById(doctorID, {
+      name,
+      phoneNumber,
+      address,
+      email,
+      specialization,
+      lat,
+      lng,
+    });
     res.json(updatedDoctor);
   } catch (error) {
     res.status(500).json({ error: error.message });

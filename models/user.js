@@ -3,7 +3,11 @@ const db = require("../firebaseAdmin");
 const UserRead = {
   getAllUsers: async () => {
     try {
-      const snapshot = await db.collection("Users").where("visible", "==", 1).orderBy("userId", "asc").get();
+      const snapshot = await db
+        .collection("Users")
+        .where("visible", "==", 1)
+        .orderBy("userId", "asc")
+        .get();
       const list = snapshot.docs.map((doc) => {
         const data = doc.data();
         return {
@@ -12,6 +16,8 @@ const UserRead = {
           phoneNumber: data.phoneNumber || "",
           address: data.address || "",
           email: data.email || "",
+          lat: accountData.lat || "",
+          lng: accountData.lng || "",
           visible: data.visible || 1,
         };
       });
@@ -22,7 +28,11 @@ const UserRead = {
   },
   getUserById: async (userID) => {
     try {
-      const querySnapshot = await db.collection("Users").where("userId", "==", parseInt(userID)).where("visible", "==", 1).get();
+      const querySnapshot = await db
+        .collection("Users")
+        .where("userId", "==", parseInt(userID))
+        .where("visible", "==", 1)
+        .get();
       if (querySnapshot.empty) {
         throw new Error("User not found");
       }
@@ -34,6 +44,8 @@ const UserRead = {
         phoneNumber: data.phoneNumber || "",
         address: data.address || "",
         email: data.email || "",
+        lat: accountData.lat || "",
+        lng: accountData.lng || "",
         visible: data.visible || 1,
       };
     } catch (error) {
@@ -43,7 +55,7 @@ const UserRead = {
 };
 
 const UserWrite = {
-  createUser: async ({ name, phoneNumber, address, email = ""}) => {
+  createUser: async ({ name, phoneNumber, address, email = "", lat, lng }) => {
     try {
       const counterRef = db.collection("UserCounter").doc("userCounter");
       const counterDoc = await counterRef.get();
@@ -65,6 +77,8 @@ const UserWrite = {
         phoneNumber,
         address,
         email,
+        lat,
+        lng,
         visible: 1,
       };
 
@@ -72,7 +86,7 @@ const UserWrite = {
 
       return {
         userId: newCount,
-        ...newUserData
+        ...newUserData,
       };
     } catch (error) {
       throw new Error("Failed to create user: " + error.message);
@@ -81,7 +95,10 @@ const UserWrite = {
 
   updateUserById: async (userID, newData) => {
     try {
-      const querySnapshot = await db.collection("Users").where("userId", "==", parseInt(userID)).get();
+      const querySnapshot = await db
+        .collection("Users")
+        .where("userId", "==", parseInt(userID))
+        .get();
       if (querySnapshot.empty) {
         throw new Error("User not found");
       }
@@ -95,7 +112,10 @@ const UserWrite = {
 
   deleteUserById: async (userID) => {
     try {
-      const querySnapshot = await db.collection("Users").where("userId", "==", parseInt(userID)).get();
+      const querySnapshot = await db
+        .collection("Users")
+        .where("userId", "==", parseInt(userID))
+        .get();
       if (querySnapshot.empty) {
         throw new Error("User not found");
       }
@@ -110,5 +130,5 @@ const UserWrite = {
 
 module.exports = {
   UserRead,
-  UserWrite
+  UserWrite,
 };
