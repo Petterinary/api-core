@@ -9,25 +9,9 @@ const ServiceRegistrationFormRead = {
 
         let doctorName = "";
         let userName = "";
-        let address = data.address || "";
-
-        // Fetch doctor details
-        if (data.doctorId) {
-          try {
-            const doctorQuery = await db.collection("Doctors").where("doctorId", "==", data.doctorId).get();
-            if (!doctorQuery.empty) {
-              const doctorData = doctorQuery.docs[0].data();
-              doctorName = doctorData.name;
-              if (data.visitType === 1) {
-                address = doctorData.address || address;
-              }
-            } else {
-              console.log(`Doctor with ID ${data.doctorId} not found.`);
-            }
-          } catch (error) {
-            console.error(`Error fetching doctor data for ID ${data.doctorId}: ${error.message}`);
-          }
-        }
+        let address = "";
+        let lat = "";
+        let lng = "";
 
         // Fetch user details
         if (data.userId) {
@@ -36,8 +20,10 @@ const ServiceRegistrationFormRead = {
             if (!userQuery.empty) {
               const userData = userQuery.docs[0].data();
               userName = userData.name;
-              if (data.visitType === 2) {
-                address = userData.address || address;
+              if (data.visitType === 1) {
+                address = userData.address;
+                lat = userData.lat;
+                lng = userData.lng;
               }
             } else {
               console.log(`User with ID ${data.userId} not found.`);
@@ -47,10 +33,32 @@ const ServiceRegistrationFormRead = {
           }
         }
 
+        // Fetch doctor details
+        if (data.doctorId) {
+          try {
+            const doctorQuery = await db.collection("Doctors").where("doctorId", "==", data.doctorId).get();
+            if (!doctorQuery.empty) {
+              const doctorData = doctorQuery.docs[0].data();
+              doctorName = doctorData.name;
+              if (data.visitType === 2) {
+                address = doctorData.address;
+                lat = doctorData.lat;
+                lng = doctorData.lng;
+              }
+            } else {
+              console.log(`Doctor with ID ${data.doctorId} not found.`);
+            }
+          } catch (error) {
+            console.error(`Error fetching doctor data for ID ${data.doctorId}: ${error.message}`);
+          }
+        }
+
         return {
           serviceRegistrationFormId: data.serviceRegistrationFormId || null,
           registrationDate: data.registrationDate ? data.registrationDate.toDate() : null,
           address,
+          lat,
+          lng,
           petName: data.petName || "",
           petType: data.petType || "",
           complaint: data.complaint || "",
@@ -80,25 +88,9 @@ const ServiceRegistrationFormRead = {
 
       let doctorName = "";
       let userName = "";
-      let address = data.address || "";
-
-      // Fetch doctor details
-      if (data.doctorId) {
-        try {
-          const doctorQuery = await db.collection("Doctors").where("doctorId", "==", data.doctorId).get();
-          if (!doctorQuery.empty) {
-            const doctorData = doctorQuery.docs[0].data();
-            doctorName = doctorData.name;
-            if (data.visitType === 1) {
-              address = doctorData.address || address;
-            }
-          } else {
-            console.log(`Doctor with ID ${data.doctorId} not found.`);
-          }
-        } catch (error) {
-          console.error(`Error fetching doctor data for ID ${data.doctorId}: ${error.message}`);
-        }
-      }
+      let address = "";
+      let lat = "";
+      let lng = "";
 
       // Fetch user details
       if (data.userId) {
@@ -107,8 +99,10 @@ const ServiceRegistrationFormRead = {
           if (!userQuery.empty) {
             const userData = userQuery.docs[0].data();
             userName = userData.name;
-            if (data.visitType === 2) {
-              address = userData.address || address;
+            if (data.visitType === 1) {
+              address = userData.address;
+              lat = userData.lat;
+              lng = userData.lng;
             }
           } else {
             console.log(`User with ID ${data.userId} not found.`);
@@ -118,10 +112,32 @@ const ServiceRegistrationFormRead = {
         }
       }
 
+      // Fetch doctor details
+      if (data.doctorId) {
+        try {
+          const doctorQuery = await db.collection("Doctors").where("doctorId", "==", data.doctorId).get();
+          if (!doctorQuery.empty) {
+            const doctorData = doctorQuery.docs[0].data();
+            doctorName = doctorData.name;
+            if (data.visitType === 2) {
+              address = doctorData.address;
+              lat = doctorData.lat;
+              lng = doctorData.lng;
+            }
+          } else {
+            console.log(`Doctor with ID ${data.doctorId} not found.`);
+          }
+        } catch (error) {
+          console.error(`Error fetching doctor data for ID ${data.doctorId}: ${error.message}`);
+        }
+      }
+
       return {
         serviceRegistrationFormId: data.serviceRegistrationFormId || null,
         registrationDate: data.registrationDate ? data.registrationDate.toDate() : null,
         address,
+        lat,
+        lng,
         petName: data.petName || "",
         petType: data.petType || "",
         complaint: data.complaint || "",
@@ -140,7 +156,7 @@ const ServiceRegistrationFormRead = {
 };
 
 const ServiceRegistrationFormWrite = {
-  createServiceRegistrationForm: async ({ registrationDate, address, petName, petType, complaint, visitType, doctorId, userId }) => {
+  createServiceRegistrationForm: async ({ registrationDate, address, petName, petType, complaint, visitType, doctorId, userId, lat, lng }) => {
     try {
       const counterRef = db.collection("ServiceRegistrationFormCounter").doc("serviceRegistrationFormCounter");
       const counterDoc = await counterRef.get();
@@ -166,6 +182,8 @@ const ServiceRegistrationFormWrite = {
         visitType,
         doctorId,
         userId,
+        lat,
+        lng,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       };

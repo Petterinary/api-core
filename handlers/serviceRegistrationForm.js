@@ -36,14 +36,16 @@ const getServiceRegistrationFormById = async (req, res) => {
 };
 
 const createServiceRegistrationForm = async (req, res) => {
-  const { registrationDate, address, petName, petType, complaint, visitType, doctorId, userId } = req.body;
-  if (!registrationDate || !address || !petName || !petType || !complaint || !visitType || !doctorId || !userId) {
+  const { registrationDate, address, petName, petType, complaint, visitType, doctorId, userId, lat, lng } = req.body;
+  if (!registrationDate || !address || !lat || !lng || !petName || !petType || !complaint || !visitType || !doctorId || !userId) {
     return res.status(400).json({ error: "Missing required fields" });
   }
   try {
     const newServiceRegistrationForm = await ServiceRegistrationForm.ServiceRegistrationFormWrite.createServiceRegistrationForm({
       registrationDate,
       address,
+      lat,
+      lng,
       petName,
       petType,
       complaint,
