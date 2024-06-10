@@ -15,6 +15,8 @@ const AccountRead = {
           phoneNumber: data.phoneNumber || "",
           userType: data.userType || "",
           uid: data.uid || "",
+          lat: data.lat || "",
+          lng: data.lng || "",
           createdAt: data.createdAt ? data.createdAt.toDate() : null,
           updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
         };
@@ -42,6 +44,8 @@ const AccountRead = {
         phoneNumber: data.phoneNumber || "",
         userType: data.userType || "",
         uid: data.uid || "",
+        lat: data.lat || "",
+        lng: data.lng || "",
         createdAt: data.createdAt ? data.createdAt.toDate() : null,
         updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
       };
@@ -67,6 +71,8 @@ const AccountRead = {
         specialization: data.specialization || "",
         doctorSchedule: data.doctorSchedule || "",
         experience: data.experience || "",
+        lat: data.lat || "",
+        lng: data.lng || "",
       };
     } catch (error) {
       throw new Error("Failed to fetch doctor: " + error.message);
@@ -90,6 +96,8 @@ const AccountRead = {
         phoneNumber: data.phoneNumber || "",
         userType: data.userType || "",
         uid: data.uid || "",
+        lat: data.lat || "",
+        lng: data.lng || "",
         createdAt: data.createdAt ? data.createdAt.toDate() : null,
         updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
       };
@@ -100,7 +108,7 @@ const AccountRead = {
 };
 
 const AccountWrite = {
-  createAccount: async ({ email, username, address, phoneNumber, userType, uid, gender }) => {
+  createAccount: async ({ email, username, address, phoneNumber, userType, uid, gender, lat, lng }) => {
     try {
       const counterRef = db.collection("AccountCounter").doc("accountCounter");
       const counterDoc = await counterRef.get();
@@ -125,6 +133,8 @@ const AccountWrite = {
         userType,
         uid,
         gender,
+        lat,
+        lng,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       };
@@ -142,7 +152,7 @@ const AccountWrite = {
     }
   },
 
-  createDoctorAccount: async ({ email, username, address, phoneNumber, userType, uid, doctorSchedule, experience, specialization, gender }) => {
+  createDoctorAccount: async ({ email, username, address, phoneNumber, userType, uid, doctorSchedule, experience, specialization, gender, lat, lng }) => {
     try {
       const accountCounterRef = db.collection("AccountCounter").doc("accountCounter");
       const accountCounterDoc = await accountCounterRef.get();
@@ -180,6 +190,8 @@ const AccountWrite = {
         userType,
         uid,
         gender,
+        lat,
+        lng,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
         doctorId: newDoctorId,
@@ -196,6 +208,8 @@ const AccountWrite = {
         doctorSchedule,
         experience,
         gender,
+        lat,
+        lng,
         visible: 1,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
@@ -217,6 +231,8 @@ const AccountWrite = {
         experience,
         specialization,
         gender,
+        lat,
+        lng,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
