@@ -25,7 +25,6 @@ const createUser = async (req, res) => {
     phoneNumber,
     address,
     email = "",
-    specialization = "",
     lat,
     lng,
   } = req.body;
@@ -35,7 +34,6 @@ const createUser = async (req, res) => {
       phoneNumber,
       address,
       email,
-      specialization,
       lat,
       lng,
     });
@@ -52,7 +50,6 @@ const updateUserById = async (req, res) => {
     phoneNumber,
     address,
     email = "",
-    specialization = "",
     lat,
     lng,
   } = req.body;
@@ -62,7 +59,6 @@ const updateUserById = async (req, res) => {
       phoneNumber,
       address,
       email,
-      specialization,
       lat,
       lng,
     });
@@ -76,7 +72,7 @@ const deleteUserById = async (req, res) => {
   const { userID } = req.params;
   try {
     await User.UserWrite.deleteUserById(userID);
-    res.json({ message: "User deleted successfully" });
+    res.json({ message: "User hidden successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
