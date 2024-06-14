@@ -200,6 +200,7 @@ const AccountWrite = {
       const newUserRef = db.collection("Users").doc();
       const newUserData = {
         userId: newUserId,
+        accountId: newAccountId,
         email,
         username,
         address,
@@ -273,6 +274,7 @@ const AccountWrite = {
       const newDoctorRef = db.collection("Doctors").doc();
       const newDoctorData = {
         doctorId: newDoctorId,
+        accountId: newAccountId,
         name: username,
         address,
         email,
@@ -294,18 +296,7 @@ const AccountWrite = {
       return {
         accountId: newAccountId,
         doctorId: newDoctorId,
-        email,
-        username,
-        address,
-        phoneNumber,
-        userType,
-        uid,
-        doctorSchedule,
-        experience,
-        specialization,
-        gender,
-        lat,
-        lng,
+        ...newDoctorData,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
