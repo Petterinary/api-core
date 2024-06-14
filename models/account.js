@@ -16,7 +16,7 @@ const AccountRead = {
         } else {
           throw new Error("Invalid userType");
         }
-        
+
         return {
           accountId: data.accountId || null,
           [idField]: data[idField] || null,
@@ -30,6 +30,7 @@ const AccountRead = {
           lng: data.lng || "",
           createdAt: data.createdAt ? data.createdAt.toDate() : null,
           updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
+          visible: data.visible
         };
       });
       return list;
@@ -69,6 +70,7 @@ const AccountRead = {
         lng: data.lng || "",
         createdAt: data.createdAt ? data.createdAt.toDate() : null,
         updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
+        visible: data.visible
       };
     } catch (error) {
       throw new Error("Failed to fetch account: " + error.message);
@@ -108,6 +110,7 @@ const AccountRead = {
         lng: data.lng || "",
         createdAt: data.createdAt ? data.createdAt.toDate() : null,
         updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
+        visible: data.visible
       };
     } catch (error) {
       throw new Error("Failed to fetch account: " + error.message);
@@ -161,6 +164,7 @@ const AccountWrite = {
         lng,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
+        visible: 1,
       };
 
       await newAccountRef.set(newAccountData);
@@ -219,6 +223,7 @@ const AccountWrite = {
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
         userId: newUserId,
+        visible: 1,
       };
 
       const newUserRef = db.collection("Users").doc();
@@ -234,6 +239,7 @@ const AccountWrite = {
         lng,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
+        visible: 1,
       };
 
       await newAccountRef.set(newAccountData);
@@ -293,6 +299,7 @@ const AccountWrite = {
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
         doctorId: newDoctorId,
+        visible: 1,
       };
 
       const newDoctorRef = db.collection("Doctors").doc();
@@ -312,6 +319,7 @@ const AccountWrite = {
         visible: 1,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
+        visible: 1,
       };
 
       await newAccountRef.set(newAccountData);
@@ -353,7 +361,7 @@ const AccountWrite = {
         throw new Error("Account not found");
       }
       const doc = querySnapshot.docs[0];
-      await db.collection("Accounts").doc(doc.id).delete();
+      await db.collection("Accounts").doc(doc.id).update({ visible: 0 });
       return { msg: "Account deleted" };
     } catch (error) {
       throw new Error("Failed to delete account: " + error.message);
