@@ -167,19 +167,6 @@ const AccountWrite = {
         await accountCounterRef.update({ count: newAccountId });
       }
 
-      const userCounterRef = db.collection("UserCounter").doc("userCounter");
-      const userCounterDoc = await userCounterRef.get();
-
-      let newUserId;
-      if (!userCounterDoc.exists) {
-        await userCounterRef.set({ count: 1 });
-        newUserId = 1;
-      } else {
-        const currentCount = userCounterDoc.data().count || 0;
-        newUserId = currentCount + 1;
-        await userCounterRef.update({ count: newUserId });
-      }
-
       const newAccountRef = db.collection("Accounts").doc();
       const newAccountData = {
         accountId: newAccountId,
@@ -194,20 +181,18 @@ const AccountWrite = {
         lng,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
-        userId: newUserId,
       };
 
       const newUserRef = db.collection("Users").doc();
       const newUserData = {
-        userId: newUserId,
-        name: username,
-        address,
+        userId: newAccountId,
         email,
+        username,
+        address,
         phoneNumber,
         gender,
         lat,
         lng,
-        visible: 1,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       };
@@ -217,16 +202,7 @@ const AccountWrite = {
 
       return {
         accountId: newAccountId,
-        userId: newUserId,
-        email,
-        username,
-        address,
-        phoneNumber,
-        userType,
-        uid,
-        gender,
-        lat,
-        lng,
+        ...newAccountData,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
