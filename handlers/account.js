@@ -86,6 +86,34 @@ const createAccount = async (req, res) => {
   }
 };
 
+const createUserAccount = async (req, res) => {
+  const { email, username, address, phoneNumber, userType, uid, gender, lat, lng } = req.body;
+  if (!email || !username || !address || !phoneNumber || !userType || !uid || !gender || !lat || !lng) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+  try {
+    const newUserAccount = await Account.AccountWrite.createUserAccount({
+      email,
+      username,
+      address,
+      phoneNumber,
+      userType,
+      uid,
+      gender,
+      lat,
+      lng,
+    });
+    const convertedUserAccount = {
+      ...newUserAccount,
+      createdAt: newUserAccount.createdAt ? convertToIndonesianTime(newUserAccount.createdAt) : null,
+      updatedAt: newUserAccount.updatedAt ? convertToIndonesianTime(newUserAccount.updatedAt) : null,
+    };
+    res.status(201).json(convertedUserAccount);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const createDoctorAccount = async (req, res) => {
   const { email, username, address, phoneNumber, userType, uid, doctorSchedule, experience, specialization, gender, lat, lng } = req.body;
   if (!email || !username || !address || !phoneNumber || !userType || !uid || !doctorSchedule || !experience || !specialization || !gender || !lat || !lng ) {
@@ -144,6 +172,7 @@ module.exports = {
   getDoctorById,
   getAccountByUid,
   createAccount,
+  createUserAccount,
   createDoctorAccount,
   updateAccountById,
   deleteAccountById,
