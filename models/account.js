@@ -7,8 +7,19 @@ const AccountRead = {
       const snapshot = await db.collection("Accounts").orderBy("accountId", "asc").get();
       const list = snapshot.docs.map(doc => {
         const data = doc.data();
+
+        let idField;
+        if (data.userType === "1") {
+          idField = "userId";
+        } else if (data.userType === "2") {
+          idField = "doctorId";
+        } else {
+          throw new Error("Invalid userType");
+        }
+        
         return {
           accountId: data.accountId || null,
+          [idField]: data[idField] || null,
           email: data.email || "",
           username: data.username || "",
           address: data.address || "",
@@ -36,8 +47,18 @@ const AccountRead = {
       const doc = querySnapshot.docs[0];
       const data = doc.data();
 
+      let idField;
+      if (data.userType === "1") {
+        idField = "userId";
+      } else if (data.userType === "2") {
+        idField = "doctorId";
+      } else {
+        throw new Error("Invalid userType");
+      }
+
       return {
         accountId: data.accountId || null,
+        [idField]: data[idField] || null,
         email: data.email || "",
         username: data.username || "",
         address: data.address || "",
@@ -51,31 +72,6 @@ const AccountRead = {
       };
     } catch (error) {
       throw new Error("Failed to fetch account: " + error.message);
-    }
-  },
-
-  getDoctorById: async (doctorId) => {
-    try {
-      const querySnapshot = await db.collection("Doctors").where("doctorId", "==", parseInt(doctorId)).get();
-      if (querySnapshot.empty) {
-        throw new Error("Doctor not found");
-      }
-      const doc = querySnapshot.docs[0];
-      const data = doc.data();
-      return {
-        doctorId: data.doctorId || null,
-        name: data.name || "",
-        address: data.address || "",
-        email: data.email || "",
-        phoneNumber: data.phoneNumber || "",
-        specialization: data.specialization || "",
-        doctorSchedule: data.doctorSchedule || "",
-        experience: data.experience || "",
-        lat: data.lat || "",
-        lng: data.lng || "",
-      };
-    } catch (error) {
-      throw new Error("Failed to fetch doctor: " + error.message);
     }
   },
 
@@ -88,8 +84,20 @@ const AccountRead = {
       const doc = querySnapshot.docs[0];
       const data = doc.data();
 
+      let idField;
+      if (data.userType === "1") {
+        idField = "userId";
+      } else if (data.userType === "2") {
+        idField = "doctorId";
+      } else {
+        throw new Error("Invalid userType");
+      }
+
+      const userData = await AccountRead.getUserOrDoctorData(data.userType, data[idField]);
+
       return {
         accountId: data.accountId || null,
+        [idField]: data[idField] || null,
         email: data.email || "",
         username: data.username || "",
         address: data.address || "",
@@ -104,6 +112,22 @@ const AccountRead = {
     } catch (error) {
       throw new Error("Failed to fetch account: " + error.message);
     }
+  },
+
+  getUserOrDoctorData: async (userType, id) => {
+    let userData = {};
+    if (userType === "1") {
+      const userSnapshot = await db.collection("Users").where("userId", "==", id).get();
+      if (!userSnapshot.empty) {
+        userData = userSnapshot.docs[0].data();
+      }
+    } else if (userType === "2") {
+      const doctorSnapshot = await db.collection("Doctors").where("doctorId", "==", id).get();
+      if (!doctorSnapshot.empty) {
+        userData = doctorSnapshot.docs[0].data();
+      }
+    }
+    return userData;
   },
 };
 
