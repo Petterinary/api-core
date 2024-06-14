@@ -16,8 +16,8 @@ const UserRead = {
           phoneNumber: data.phoneNumber || "",
           address: data.address || "",
           email: data.email || "",
-          lat: accountData.lat || "",
-          lng: accountData.lng || "",
+          lat: data.lat || "",
+          lng: data.lng || "",
           visible: data.visible || 1,
         };
       });
@@ -26,6 +26,7 @@ const UserRead = {
       throw new Error("Failed to fetch users: " + error.message);
     }
   },
+
   getUserById: async (userID) => {
     try {
       const querySnapshot = await db
@@ -44,8 +45,8 @@ const UserRead = {
         phoneNumber: data.phoneNumber || "",
         address: data.address || "",
         email: data.email || "",
-        lat: accountData.lat || "",
-        lng: accountData.lng || "",
+        lat: data.lat || "",
+        lng: data.lng || "",
         visible: data.visible || 1,
       };
     } catch (error) {
@@ -120,7 +121,7 @@ const UserWrite = {
         throw new Error("User not found");
       }
       const doc = querySnapshot.docs[0];
-      await db.collection("Users").doc(doc.id).update({ visible: 0 }); // Update visibility to 0 instead of deleting
+      await db.collection("Users").doc(doc.id).update({ visible: 0 });
       return { msg: "User hidden" };
     } catch (error) {
       throw new Error("Failed to hide user: " + error.message);
