@@ -29,12 +29,13 @@ const ConsultationRead = {
             stageStatus: stageStatus || "",
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
-            idUser: userName,
-            idDoctor: doctorName,
-            idRegistrationForm: {
-              createdAt: registrationData.createdAt ? registrationData.createdAt.toDate() : null,
-              visitType: registrationData.visitType || ""
-            }
+            idUser: data.idUser,
+            userName: userName,
+            idDoctor: data.idDoctor,
+            doctorName: doctorName,
+            idRegistrationForm: data.idRegistrationForm,
+            createdAt: registrationData.createdAt ? registrationData.createdAt.toDate() : null,
+            visitType: registrationData.visitType || ""
           };
         })
       );
@@ -72,12 +73,13 @@ const ConsultationRead = {
             stageStatus: stageStatus || "",
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
-            idUser: userName,
-            idDoctor: doctorName,
-            idRegistrationForm: {
-              createdAt: registrationData.createdAt ? registrationData.createdAt.toDate() : null,
-              visitType: registrationData.visitType || ""
-            }
+            idUser: data.idUser,
+            userName: userName,
+            idDoctor: data.idDoctor,
+            doctorName: doctorName,
+            idRegistrationForm: data.idRegistrationForm,
+            createdAt: registrationData.createdAt ? registrationData.createdAt.toDate() : null,
+            visitType: registrationData.visitType || ""
           };
         })
       );
@@ -115,12 +117,13 @@ const ConsultationRead = {
             stageStatus: stageStatus || "",
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
-            idUser: userName,
-            idDoctor: doctorName,
-            idRegistrationForm: {
-              createdAt: registrationData.createdAt ? registrationData.createdAt.toDate() : null,
-              visitType: registrationData.visitType || ""
-            }
+            idUser: data.idUser,
+            userName: userName,
+            idDoctor: data.idDoctor,
+            doctorName: doctorName,
+            idRegistrationForm: data.idRegistrationForm,
+            createdAt: registrationData.createdAt ? registrationData.createdAt.toDate() : null,
+            visitType: registrationData.visitType || ""
           };
         })
       );
@@ -152,13 +155,9 @@ const ConsultationRead = {
         stageStatus: data.stageStatus || "",
         createdAt: data.createdAt ? data.createdAt.toDate() : null,
         updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
-        user: {
           name: userData.name || "",
-          phoneNumber: userData.phoneNumber || ""
-        },
-        registrationForm: {
+          phoneNumber: userData.phoneNumber || "",
           complaint: registrationData.complaint || ""
-        }
       };
     } catch (error) {
       throw new Error("Failed to fetch detailed consultation: " + error.message);

@@ -152,6 +152,89 @@ const AccountWrite = {
     }
   },
 
+  createUserAccount: async ({ email, username, address, phoneNumber, userType, uid, gender, lat, lng }) => {
+    try {
+      const accountCounterRef = db.collection("AccountCounter").doc("accountCounter");
+      const accountCounterDoc = await accountCounterRef.get();
+
+      let newAccountId;
+      if (!accountCounterDoc.exists) {
+        await accountCounterRef.set({ count: 1 });
+        newAccountId = 1;
+      } else {
+        const currentCount = accountCounterDoc.data().count || 0;
+        newAccountId = currentCount + 1;
+        await accountCounterRef.update({ count: newAccountId });
+      }
+
+      const userCounterRef = db.collection("UserCounter").doc("userCounter");
+      const userCounterDoc = await userCounterRef.get();
+
+      let newUserId;
+      if (!userCounterDoc.exists) {
+        await userCounterRef.set({ count: 1 });
+        newUserId = 1;
+      } else {
+        const currentCount = userCounterDoc.data().count || 0;
+        newUserId = currentCount + 1;
+        await userCounterRef.update({ count: newUserId });
+      }
+
+      const newAccountRef = db.collection("Accounts").doc();
+      const newAccountData = {
+        accountId: newAccountId,
+        email,
+        username,
+        address,
+        phoneNumber,
+        userType,
+        uid,
+        gender,
+        lat,
+        lng,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+        userId: newUserId,
+      };
+
+      const newUserRef = db.collection("Users").doc();
+      const newUserData = {
+        userId: newUserId,
+        name: username,
+        address,
+        email,
+        phoneNumber,
+        gender,
+        lat,
+        lng,
+        visible: 1,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      };
+
+      await newAccountRef.set(newAccountData);
+      await newUserRef.set(newUserData);
+
+      return {
+        accountId: newAccountId,
+        userId: newUserId,
+        email,
+        username,
+        address,
+        phoneNumber,
+        userType,
+        uid,
+        gender,
+        lat,
+        lng,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+    } catch (error) {
+      throw new Error("Failed to create user account: " + error.message);
+    }
+  },
+
   createDoctorAccount: async ({ email, username, address, phoneNumber, userType, uid, doctorSchedule, experience, specialization, gender, lat, lng }) => {
     try {
       const accountCounterRef = db.collection("AccountCounter").doc("accountCounter");
