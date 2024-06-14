@@ -3,22 +3,27 @@ const db = require("../firebaseAdmin");
 const UserRead = {
   getAllUsers: async () => {
     try {
-      const snapshot = await db
-        .collection("Users")
+      const snapshot = await db.collection("Users")
         .where("visible", "==", 1)
         .orderBy("userId", "asc")
         .get();
+
       const list = snapshot.docs.map((doc) => {
         const data = doc.data();
         return {
           userId: data.userId || null,
-          name: data.name || "",
-          phoneNumber: data.phoneNumber || "",
-          address: data.address || "",
+          accountId: data.accountId || null,
           email: data.email || "",
+          username: data.username || "",
+          address: data.address || "",
+          phoneNumber: data.phoneNumber || "",
+          gender: data.gender || "",
+          userType: data.userType || "",
           lat: data.lat || "",
           lng: data.lng || "",
-          visible: data.visible || 1,
+          createdAt: data.createdAt ? data.createdAt.toDate() : null,
+          updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
+          visible: data.visible,
         };
       });
       return list;
@@ -29,8 +34,7 @@ const UserRead = {
 
   getUserById: async (userID) => {
     try {
-      const querySnapshot = await db
-        .collection("Users")
+      const querySnapshot = await db.collection("Users")
         .where("userId", "==", parseInt(userID))
         .where("visible", "==", 1)
         .get();
@@ -41,13 +45,18 @@ const UserRead = {
       const data = doc.data();
       return {
         userId: data.userId || null,
-        name: data.name || "",
-        phoneNumber: data.phoneNumber || "",
-        address: data.address || "",
-        email: data.email || "",
-        lat: data.lat || "",
-        lng: data.lng || "",
-        visible: data.visible || 1,
+          accountId: data.accountId || null,
+          email: data.email || "",
+          username: data.username || "",
+          address: data.address || "",
+          phoneNumber: data.phoneNumber || "",
+          gender: data.gender || "",
+          userType: data.userType || "",
+          lat: data.lat || "",
+          lng: data.lng || "",
+          createdAt: data.createdAt ? data.createdAt.toDate() : null,
+          updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
+          visible: data.visible,
       };
     } catch (error) {
       throw new Error("Failed to fetch User");
