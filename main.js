@@ -8,7 +8,6 @@ app.use(cors());
 
 const accountsRoutes = require('./routes/account');
 const consultationRoutes = require("./routes/consultation");
-const consultationStageRoutes = require("./routes/consultationStage");
 const doctorRoutes = require('./routes/doctor');
 const paymentsRoutes = require('./routes/payment');
 const serviceRegistrationFormRoutes = require('./routes/serviceRegistrationForm');
@@ -16,7 +15,6 @@ const userRoutes = require('./routes/user');
 
 app.use('/accounts', accountsRoutes);
 app.use("/consultations", consultationRoutes);
-app.use('/consultationStages', consultationStageRoutes);
 app.use('/doctors', doctorRoutes);
 app.use('/payments', paymentsRoutes);
 app.use('/serviceRegistrationForms', serviceRegistrationFormRoutes);
