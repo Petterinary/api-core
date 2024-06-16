@@ -4,10 +4,7 @@ const db = require("../firebaseAdmin");
 const ServiceRegistrationFormRead = {
   getAllServiceRegistrationForms: async () => {
     try {
-      const snapshot = await db
-        .collection("ServiceRegistrationForms")
-        .orderBy("serviceRegistrationFormId", "asc")
-        .get();
+      const snapshot = await db.collection("ServiceRegistrationForms").orderBy("serviceRegistrationFormId", "asc").get();
       const list = await Promise.all(
         snapshot.docs.map(async (doc) => {
           const data = doc.data();
@@ -18,17 +15,14 @@ const ServiceRegistrationFormRead = {
           let lat = "";
           let lng = "";
 
-          // Fetch user details
           if (data.userId) {
             try {
-              const userQuery = await db
-                .collection("Users")
-                .where("userId", "==", data.userId)
-                .get();
-              if (!userQuery.empty) {
-                const userData = userQuery.docs[0].data();
-                userName = userData.name;
-                if (data.visitType === 1) {
+              const userDocRef = db.collection("Users").where("userId", "==", data.userId);
+              const userSnapshot = await userDocRef.get();
+              if (!userSnapshot.empty) {
+                const userData = userSnapshot.docs[0].data();
+                userName = userData.username;
+                if (data.visitType === "1") {
                   address = userData.address;
                   lat = userData.lat;
                   lng = userData.lng;
@@ -37,23 +31,17 @@ const ServiceRegistrationFormRead = {
                 console.log(`User with ID ${data.userId} not found.`);
               }
             } catch (error) {
-              console.error(
-                `Error fetching user data for ID ${data.userId}: ${error.message}`
-              );
+              console.error(`Error fetching user data for ID ${data.userId}: ${error.message}`);
             }
           }
 
-          // Fetch doctor details
           if (data.doctorId) {
             try {
-              const doctorQuery = await db
-                .collection("Doctors")
-                .where("doctorId", "==", data.doctorId)
-                .get();
+              const doctorQuery = await db.collection("Doctors").where("doctorId", "==", data.doctorId).get();
               if (!doctorQuery.empty) {
                 const doctorData = doctorQuery.docs[0].data();
                 doctorName = doctorData.name;
-                if (data.visitType === 2) {
+                if (data.visitType === "2") {
                   address = doctorData.address;
                   lat = doctorData.lat;
                   lng = doctorData.lng;
@@ -62,17 +50,13 @@ const ServiceRegistrationFormRead = {
                 console.log(`Doctor with ID ${data.doctorId} not found.`);
               }
             } catch (error) {
-              console.error(
-                `Error fetching doctor data for ID ${data.doctorId}: ${error.message}`
-              );
+              console.error(`Error fetching doctor data for ID ${data.doctorId}: ${error.message}`);
             }
           }
 
           return {
             serviceRegistrationFormId: data.serviceRegistrationFormId || null,
-            registrationDate: data.registrationDate
-              ? data.registrationDate.toDate()
-              : null,
+            registrationDate: data.registrationDate ? data.registrationDate.toDate() : null,
             address,
             lat,
             lng,
@@ -91,9 +75,7 @@ const ServiceRegistrationFormRead = {
       );
       return list;
     } catch (error) {
-      throw new Error(
-        "Failed to fetch service registration forms: " + error.message
-      );
+      throw new Error("Failed to fetch service registration forms: " + error.message);
     }
   },
 
@@ -258,9 +240,10 @@ const ServiceRegistrationFormWrite = {
       const newConsultationRef = db.collection("Consultations").doc();
       const newConsultationData = {
         consultationId: newCount2,
+        visitType,
         userId: userId,
         doctorId: doctorId,
-        registrationFormId: newCount,
+        serviceRegistrationFormId: newCount,
         stageStatus: 0,
         passStatus: 0,
         createdAt: FieldValue.serverTimestamp(),
