@@ -30,9 +30,9 @@ const getConsultationsByDoctorId = async (req, res) => {
 };
 
 const getDetailedConsultation = async (req, res) => {
-  const { idConsultation } = req.params;
+  const { consultationId } = req.params;
   try {
-    const consultation = await Consultation.ConsultationRead.getDetailedConsultation(idConsultation);
+    const consultation = await Consultation.ConsultationRead.getDetailedConsultation(consultationId);
     res.json(consultation);
   } catch (error) {
     res.status(404).json({ error: error.message });

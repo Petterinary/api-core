@@ -1,166 +1,206 @@
+const { FieldValue } = require("firebase-admin/firestore");
 const db = require("../firebaseAdmin");
 
 const ConsultationRead = {
   getConsultation: async () => {
     try {
-      const snapshot = await db.collection("Consultations").orderBy("idConsultation", "asc").get();
+      const snapshot = await db.collection("Consultations").orderBy("consultationId", "asc").get();
       const list = await Promise.all(
         snapshot.docs.map(async (doc) => {
           const data = doc.data();
 
-          // Fetch user name
-          const userSnapshot = await db.collection("Users").doc(data.idUser).get();
-          const userName = userSnapshot.exists ? userSnapshot.data().name : "";
+          // Check if userId and doctorId exist
+          if (!data.userId) {
+            console.error("Consultation document missing userId:", data);
+            throw new Error("Consultation document missing userId");
+          }
 
-          // Fetch registration form data
-          const registrationSnapshot = await db.collection("ServiceRegistrationForms").doc(data.idRegistrationForm).get();
-          const registrationData = registrationSnapshot.exists ? registrationSnapshot.data() : {};
+          if (!data.doctorId) {
+            console.error("Consultation document missing doctorId:", data);
+            throw new Error("Consultation document missing doctorId");
+          }
+
+          // Fetch user name
+          const userDocRef = db.collection("Users").where("userId", "==", data.userId);
+          const userSnapshot = await userDocRef.get();
+          const userName = !userSnapshot.empty ? userSnapshot.docs[0].data().username : "";
 
           // Fetch doctor name
-          const doctorSnapshot = await db.collection("Doctors").where("doctorId", "==", data.idDoctor).get();
-          const doctorName = doctorSnapshot.empty ? "" : doctorSnapshot.docs[0].data().name;
-
-          // Fetch consultation stage status
-          const stageSnapshot = await db.collection("ConsultationStages").where("idConsultationStage", "==", data.stageStatus).get();
-          const stageStatus = stageSnapshot.empty ? "" : stageSnapshot.docs[0].data().passStatus;
+          const doctorDocRef = db.collection("Doctors").where("doctorId", "==", data.doctorId);
+          const doctorSnapshot = await doctorDocRef.get();
+          const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
 
           return {
-            idConsultation: data.idConsultation || null,
-            stageStatus: stageStatus || "",
+            consultationId: data.consultationId || null,
+            serviceRegistrationFormId: data.serviceRegistrationFormId,
+            visitType: data.visitType || "",
+            doctorId: data.doctorId,
+            doctorName: doctorName,
+            userId: data.userId,
+            userName: userName,
+            stageStatus: data.stageStatus,
+            passStatus: data.passStatus,
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
-            idUser: data.idUser,
-            userName: userName,
-            idDoctor: data.idDoctor,
-            doctorName: doctorName,
-            idRegistrationForm: data.idRegistrationForm,
-            createdAt: registrationData.createdAt ? registrationData.createdAt.toDate() : null,
-            visitType: registrationData.visitType || ""
           };
         })
       );
+
       return list;
     } catch (error) {
-      throw new Error("Failed to fetch consultations: " + error.message);
+      console.error("Error fetching consultations by userId:", error);
+      throw new Error("Failed to fetch consultations by userId: " + error.message);
     }
   },
 
   getConsultationsByUserId: async (userId) => {
     try {
-      const snapshot = await db.collection("Consultations").where("idUser", "==", userId).get();
+      const snapshot = await db.collection("Consultations").where("doctorId", "==", Number(doctorId)).get();
       const list = await Promise.all(
         snapshot.docs.map(async (doc) => {
           const data = doc.data();
+          // Check if userId and doctorId exist
+          if (!data.userId) {
+            console.error("Consultation document missing userId:", data);
+            throw new Error("Consultation document missing userId");
+          }
+
+          if (!data.doctorId) {
+            console.error("Consultation document missing doctorId:", data);
+            throw new Error("Consultation document missing doctorId");
+          }
 
           // Fetch user name
-          const userSnapshot = await db.collection("Users").doc(data.idUser).get();
-          const userName = userSnapshot.exists ? userSnapshot.data().name : "";
-
-          // Fetch registration form data
-          const registrationSnapshot = await db.collection("ServiceRegistrationForms").doc(data.idRegistrationForm).get();
-          const registrationData = registrationSnapshot.exists ? registrationSnapshot.data() : {};
+          const userDocRef = db.collection("Users").where("userId", "==", data.userId);
+          const userSnapshot = await userDocRef.get();
+          const userName = !userSnapshot.empty ? userSnapshot.docs[0].data().username : "";
 
           // Fetch doctor name
-          const doctorSnapshot = await db.collection("Doctors").where("doctorId", "==", data.idDoctor).get();
-          const doctorName = doctorSnapshot.empty ? "" : doctorSnapshot.docs[0].data().name;
-
-          // Fetch consultation stage status
-          const stageSnapshot = await db.collection("ConsultationStages").where("idConsultationStage", "==", data.stageStatus).get();
-          const stageStatus = stageSnapshot.empty ? "" : stageSnapshot.docs[0].data().passStatus;
+          const doctorDocRef = db.collection("Doctors").where("doctorId", "==", data.doctorId);
+          const doctorSnapshot = await doctorDocRef.get();
+          const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
 
           return {
-            idConsultation: data.idConsultation || null,
-            stageStatus: stageStatus || "",
+            consultationId: data.consultationId || null,
+            serviceRegistrationFormId: data.serviceRegistrationFormId,
+            visitType: data.visitType || "",
+            doctorId: data.doctorId,
+            doctorName: doctorName,
+            userId: data.userId,
+            userName: userName,
+            stageStatus: data.stageStatus,
+            passStatus: data.passStatus,
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
-            idUser: data.idUser,
-            userName: userName,
-            idDoctor: data.idDoctor,
-            doctorName: doctorName,
-            idRegistrationForm: data.idRegistrationForm,
-            createdAt: registrationData.createdAt ? registrationData.createdAt.toDate() : null,
-            visitType: registrationData.visitType || ""
           };
         })
       );
+
       return list;
     } catch (error) {
+      console.error("Error fetching consultations by userId:", error);
       throw new Error("Failed to fetch consultations by userId: " + error.message);
     }
   },
 
   getConsultationsByDoctorId: async (doctorId) => {
     try {
-      const snapshot = await db.collection("Consultations").where("idDoctor", "==", doctorId).get();
+      const snapshot = await db.collection("Consultations").where("doctorId", "==", Number(doctorId)).get();
+
       const list = await Promise.all(
         snapshot.docs.map(async (doc) => {
           const data = doc.data();
 
-          // Fetch user name
-          const userSnapshot = await db.collection("Users").doc(data.idUser).get();
-          const userName = userSnapshot.exists ? userSnapshot.data().name : "";
+          // Check if userId and doctorId exist
+          if (!data.userId) {
+            throw new Error("Consultation document missing userId");
+          }
 
-          // Fetch registration form data
-          const registrationSnapshot = await db.collection("ServiceRegistrationForms").doc(data.idRegistrationForm).get();
-          const registrationData = registrationSnapshot.exists ? registrationSnapshot.data() : {};
+          if (!data.doctorId) {
+            throw new Error("Consultation document missing doctorId");
+          }
+
+          // Fetch user name
+          const userDocRef = db.collection("Users").where("userId", "==", data.userId);
+          const userSnapshot = await userDocRef.get();
+          const userName = !userSnapshot.empty ? userSnapshot.docs[0].data().username : "";
 
           // Fetch doctor name
-          const doctorSnapshot = await db.collection("Doctors").where("doctorId", "==", data.idDoctor).get();
-          const doctorName = doctorSnapshot.empty ? "" : doctorSnapshot.docs[0].data().name;
-
-          // Fetch consultation stage status
-          const stageSnapshot = await db.collection("ConsultationStages").where("idConsultationStage", "==", data.stageStatus).get();
-          const stageStatus = stageSnapshot.empty ? "" : stageSnapshot.docs[0].data().passStatus;
+          const doctorDocRef = db.collection("Doctors").where("doctorId", "==", data.doctorId);
+          const doctorSnapshot = await doctorDocRef.get();
+          const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
 
           return {
-            idConsultation: data.idConsultation || null,
-            stageStatus: stageStatus || "",
+            consultationId: data.consultationId || null,
+            serviceRegistrationFormId: data.serviceRegistrationFormId,
+            visitType: data.visitType || "",
+            doctorId: data.doctorId,
+            doctorName: doctorName,
+            userId: data.userId,
+            userName: userName,
+            stageStatus: data.stageStatus,
+            passStatus: data.passStatus,
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
-            idUser: data.idUser,
-            userName: userName,
-            idDoctor: data.idDoctor,
-            doctorName: doctorName,
-            idRegistrationForm: data.idRegistrationForm,
-            createdAt: registrationData.createdAt ? registrationData.createdAt.toDate() : null,
-            visitType: registrationData.visitType || ""
           };
         })
       );
+
       return list;
     } catch (error) {
+      console.error("Error fetching consultations by doctorId:", error);
       throw new Error("Failed to fetch consultations by doctorId: " + error.message);
     }
   },
 
   getDetailedConsultation: async (idConsultation) => {
     try {
-      const querySnapshot = await db.collection("Consultations").where("idConsultation", "==", parseInt(idConsultation)).get();
-      if (querySnapshot.empty) {
-        throw new Error("Consultation not found");
-      }
-      const doc = querySnapshot.docs[0];
-      const data = doc.data();
+      const snapshot = await db.collection("Consultations").where("consultationId", "==", consultationId).get();
+      const list = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const data = doc.data();
 
-      // Fetch user data
-      const userSnapshot = await db.collection("Users").doc(data.idUser).get();
-      const userData = userSnapshot.exists ? userSnapshot.data() : {};
+          // Check if userId and doctorId exist
+          if (!data.userId) {
+            console.error("Consultation document missing userId:", data);
+            throw new Error("Consultation document missing userId");
+          }
 
-      // Fetch registration form data
-      const registrationSnapshot = await db.collection("ServiceRegistrationForms").doc(data.idRegistrationForm).get();
-      const registrationData = registrationSnapshot.exists ? registrationSnapshot.data() : {};
+          if (!data.doctorId) {
+            console.error("Consultation document missing doctorId:", data);
+            throw new Error("Consultation document missing doctorId");
+          }
 
-      return {
-        idConsultation: data.idConsultation || null,
-        stageStatus: data.stageStatus || "",
-        createdAt: data.createdAt ? data.createdAt.toDate() : null,
-        updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
-          name: userData.name || "",
-          phoneNumber: userData.phoneNumber || "",
-          complaint: registrationData.complaint || ""
-      };
+          // Fetch user name
+          const userDocRef = db.collection("Users").where("userId", "==", data.userId);
+          const userSnapshot = await userDocRef.get();
+          const userName = !userSnapshot.empty ? userSnapshot.docs[0].data().username : "";
+
+          // Fetch doctor name
+          const doctorDocRef = db.collection("Doctors").where("doctorId", "==", data.doctorId);
+          const doctorSnapshot = await doctorDocRef.get();
+          const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
+
+          return {
+            consultationId: data.consultationId || null,
+            serviceRegistrationFormId: data.serviceRegistrationFormId,
+            visitType: data.visitType || "",
+            doctorId: data.doctorId,
+            doctorName: doctorName,
+            userId: data.userId,
+            userName: userName,
+            stageStatus: data.stageStatus,
+            passStatus: data.passStatus,
+            createdAt: data.createdAt ? data.createdAt.toDate() : null,
+            updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
+          };
+        })
+      );
+
+      return list;
     } catch (error) {
-      throw new Error("Failed to fetch detailed consultation: " + error.message);
+      console.error("Error fetching consultations by doctorId:", error);
+      throw new Error("Failed to fetch consultations by doctorId: " + error.message);
     }
   },
 };
