@@ -210,9 +210,7 @@ const ServiceRegistrationFormWrite = {
     lng,
   }) => {
     try {
-      const counterRef = db
-        .collection("ServiceRegistrationFormCounter")
-        .doc("serviceRegistrationFormCounter");
+      const counterRef = db.collection("ServiceRegistrationFormCounter").doc("serviceRegistrationFormCounter");
       const counterDoc = await counterRef.get();
 
       let newCount;
@@ -225,9 +223,7 @@ const ServiceRegistrationFormWrite = {
         await counterRef.update({ count: newCount });
       }
 
-      const newServiceRegistrationFormRef = db
-        .collection("ServiceRegistrationForms")
-        .doc();
+      const newServiceRegistrationFormRef = db.collection("ServiceRegistrationForms").doc();
       const newServiceRegistrationFormData = {
         serviceRegistrationFormId: newCount,
         registrationDate: new Date(registrationDate),
@@ -246,16 +242,43 @@ const ServiceRegistrationFormWrite = {
 
       await newServiceRegistrationFormRef.set(newServiceRegistrationFormData);
 
+      const counterRef2 = db.collection("ConsultationCounter").doc("consultationCounter");
+      const counterDoc2 = await counterRef2.get();
+
+      let newCount2;
+      if (!counterDoc2.exists) {
+        await counterRef2.set({ count: 1 });
+        newCount2 = 1;
+      } else {
+        const currentCount = counterDoc2.data().count || 0;
+        newCount2 = currentCount + 1;
+        await counterRef2.update({ count: newCount2 });
+      }
+
+      const newConsultationRef = db.collection("Consultations").doc();
+      const newConsultationData = {
+        consultationId: newCount2,
+        userId: userId,
+        doctorId: doctorId,
+        registrationFormId: newCount,
+        stageStatus: 0,
+        passStatus: 0,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      };
+
+      await newConsultationRef.set(newConsultationData);
+
       return {
         serviceRegistrationFormId: newCount,
+        consultationId: newCount2,
         ...newServiceRegistrationFormData,
+        ...newConsultationData,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
     } catch (error) {
-      throw new Error(
-        "Failed to create service registration form: " + error.message
-      );
+      throw new Error("Failed to create service registration form and consultation: " + error.message);
     }
   },
 
