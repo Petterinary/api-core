@@ -20,18 +20,27 @@ const getAllServiceRegistrationForms = async (req, res) => {
 };
 
 const getServiceRegistrationFormById = async (req, res) => {
-  const { serviceRegistrationFormId } = req.params;
   try {
+    const { serviceRegistrationFormId } = req.params; // Ensure you're correctly extracting serviceRegistrationFormId from req.params
+    if (!serviceRegistrationFormId) {
+      throw new Error("Missing serviceRegistrationFormId parameter.");
+    }
+
     const serviceRegistrationForm = await ServiceRegistrationForm.ServiceRegistrationFormRead.getServiceRegistrationFormById(serviceRegistrationFormId);
+    if (!serviceRegistrationForm) {
+      return res.status(404).json({ error: "Service registration form not found." });
+    }
+
     const convertedForm = {
       ...serviceRegistrationForm,
       createdAt: serviceRegistrationForm.createdAt ? convertToIndonesianTime(serviceRegistrationForm.createdAt) : null,
       updatedAt: serviceRegistrationForm.updatedAt ? convertToIndonesianTime(serviceRegistrationForm.updatedAt) : null,
       registrationDate: serviceRegistrationForm.registrationDate ? convertToIndonesianTime(serviceRegistrationForm.registrationDate) : null
     };
+
     res.json(convertedForm);
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
