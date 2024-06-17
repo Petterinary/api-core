@@ -289,11 +289,11 @@ const ConsultationWrite = {
     }
   },
 
-  updateConsultationById: async (idConsultation, newData) => {
+  updateConsultationById: async (consultationId, newData) => {
     try {
       const querySnapshot = await db
         .collection("Consultations")
-        .where("idConsultation", "==", parseInt(idConsultation))
+        .where("consultationId", "==", parseInt(consultationId))
         .get();
       if (querySnapshot.empty) {
         throw new Error("Consultation not found");
@@ -309,11 +309,11 @@ const ConsultationWrite = {
     }
   },
 
-  deleteConsultationById: async (idConsultation) => {
+  deleteConsultationById: async (consultationId) => {
     try {
       const querySnapshot = await db
         .collection("Consultations")
-        .where("idConsultation", "==", parseInt(idConsultation))
+        .where("consultationId", "==", parseInt(consultationId))
         .get();
       if (querySnapshot.empty) {
         throw new Error("Consultation not found");
