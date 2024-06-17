@@ -102,7 +102,7 @@ const ConsultationRead = {
           const doctorSnapshot = await doctorDocRef.get();
           const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
 
-          // Fetch doctor name
+          // Fetch complaint
           const serviceRegistrationFormDocRef = db.collection("ServiceRegistrationForms").where("serviceRegistrationFormId", "==", data.serviceRegistrationFormId);
           const serviceRegistrationFormSnapshot = await serviceRegistrationFormDocRef.get();
           const complaint = !serviceRegistrationFormSnapshot.empty ? serviceRegistrationFormSnapshot.docs[0].data().complaint : "";
@@ -171,7 +171,7 @@ const ConsultationRead = {
             ? doctorSnapshot.docs[0].data().name
             : "";
 
-          // Fetch doctor name
+          // Fetch complaint
           const serviceRegistrationFormDocRef = db.collection("ServiceRegistrationForms").where("serviceRegistrationFormId", "==", data.serviceRegistrationFormId);
           const serviceRegistrationFormSnapshot = await serviceRegistrationFormDocRef.get();
           const complaint = !serviceRegistrationFormSnapshot.empty ? serviceRegistrationFormSnapshot.docs[0].data().complaint : "";
