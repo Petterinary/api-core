@@ -15,6 +15,7 @@ const PaymentRead = {
           paymentMethod: data.paymentMethod || "",
           consultationAmount: data.consultationAmount || 0,
           serviceAmount: data.serviceAmount || 0,
+          transportAmount: data.transportAmount || 0,
           totalAmount: data.totalAmount || 0,
           paymentStatus: data.paymentStatus || 0,
           visible: data.visible || 1,
@@ -43,6 +44,7 @@ const PaymentRead = {
         paymentMethod: data.paymentMethod || "",
         consultationAmount: data.consultationAmount || 0,
         serviceAmount: data.serviceAmount || 0,
+        transportAmount: data.transportAmount || 0,
         totalAmount: data.totalAmount || 0,
         paymentStatus: data.paymentStatus || 0,
         visible: data.visible || 1,
@@ -71,7 +73,7 @@ const PaymentWrite = {
         await counterRef.update({ count: newCount });
       }
 
-      const totalAmount = parseInt(consultationAmount) + parseInt(serviceAmount);
+      const totalAmount = parseInt(consultationAmount) + parseInt(serviceAmount) + parseInt(transportAmount);
 
       const newPaymentRef = db.collection("Payments").doc();
       const newPaymentData = {
@@ -79,6 +81,7 @@ const PaymentWrite = {
         paymentMethod: "",
         consultationAmount: parseInt(consultationAmount),
         serviceAmount: parseInt(serviceAmount),
+        transportAmount: parseInt(transportAmount),
         totalAmount,
         paymentStatus: 0,
         visible: 1,

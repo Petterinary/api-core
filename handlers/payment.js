@@ -36,14 +36,16 @@ const getPaymentById = async (req, res) => {
 };
 
 const createPayment = async (req, res) => {
-  const { consultationAmount, serviceAmount } = req.body;
-  if (!consultationAmount || !serviceAmount) {
+  const { paymentMethod, consultationAmount, serviceAmount, transportAmount } = req.body;
+  if (!consultationAmount || !serviceAmount || !paymentMethod) {
     return res.status(400).json({ error: "Missing required fields" });
   }
   try {
     const newPayment = await Payment.PaymentWrite.createPayment({
+      paymentMethod,
       consultationAmount,
-      serviceAmount
+      serviceAmount,
+      transportAmount
     });
     const convertedPayment = {
       ...newPayment,
@@ -58,12 +60,13 @@ const createPayment = async (req, res) => {
 
 const updatePaymentById = async (req, res) => {
   const { paymentID } = req.params;
-  const { paymentMethod, consultationAmount, serviceAmount, paymentStatus } = req.body;
+  const { paymentMethod, consultationAmount, serviceAmount, transportAmount, paymentStatus } = req.body;
   try {
     const updatedPayment = await Payment.PaymentWrite.updatePaymentById(paymentID, {
       paymentMethod,
       consultationAmount,
       serviceAmount,
+      transportAmount,
       paymentStatus
     });
     const convertedPayment = {
