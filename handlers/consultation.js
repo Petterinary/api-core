@@ -62,11 +62,12 @@ const createConsultation = async (req, res) => {
 };
 
 const updateConsultationById = async (req, res) => {
-  const { idConsultation } = req.params;
-  const { stageStatus, idUser, idDoctor, idRegistrationForm } = req.body;
+  const { consultationId } = req.params;
+  const { stageStatus, passStatus, idUser, idDoctor, idRegistrationForm } = req.body;
   try {
-    const updatedConsultation = await Consultation.ConsultationWrite.updateConsultationById(idConsultation, {
+    const updatedConsultation = await Consultation.ConsultationWrite.updateConsultationById(consultationId, {
       stageStatus,
+      passStatus,
       idUser,
       idDoctor,
       idRegistrationForm,
