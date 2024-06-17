@@ -94,6 +94,9 @@ const ConsultationRead = {
           const userName = !userSnapshot.empty
             ? userSnapshot.docs[0].data().username
             : "";
+          const userGender = !userSnapshot.empty
+            ? userSnapshot.docs[0].data().gender
+            : "";
 
           // Fetch doctor name
           const doctorDocRef = db
@@ -101,6 +104,7 @@ const ConsultationRead = {
             .where("doctorId", "==", data.doctorId);
           const doctorSnapshot = await doctorDocRef.get();
           const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
+          const doctorGender = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().gender : "";
 
           // Fetch complaint
           const serviceRegistrationFormDocRef = db.collection("ServiceRegistrationForms").where("serviceRegistrationFormId", "==", data.serviceRegistrationFormId);
@@ -114,8 +118,10 @@ const ConsultationRead = {
             complaint: complaint,
             doctorId: data.doctorId,
             doctorName: doctorName,
+            doctorGender: doctorGender,
             userId: data.userId,
             userName: userName,
+            userGender: userGender,
             stageStatus: data.stageStatus,
             passStatus: data.passStatus,
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
@@ -161,6 +167,9 @@ const ConsultationRead = {
           const userName = !userSnapshot.empty
             ? userSnapshot.docs[0].data().username
             : "";
+          const userGender = !userSnapshot.empty
+            ? userSnapshot.docs[0].data().gender
+            : "";
 
           // Fetch doctor name
           const doctorDocRef = db
@@ -169,6 +178,9 @@ const ConsultationRead = {
           const doctorSnapshot = await doctorDocRef.get();
           const doctorName = !doctorSnapshot.empty
             ? doctorSnapshot.docs[0].data().name
+            : "";
+          const doctorGender = !doctorSnapshot.empty
+            ? doctorSnapshot.docs[0].data().gender
             : "";
 
           // Fetch complaint
@@ -183,8 +195,10 @@ const ConsultationRead = {
             complaint: complaint,
             doctorId: data.doctorId,
             doctorName: doctorName,
+            doctorGender: doctorGender,
             userId: data.userId,
             userName: userName,
+            userGender: userGender,
             stageStatus: data.stageStatus,
             passStatus: data.passStatus,
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
