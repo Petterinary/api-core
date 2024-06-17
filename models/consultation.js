@@ -55,7 +55,7 @@ const ConsultationRead = {
 
   getConsultationsByUserId: async (userId) => {
     try {
-      const snapshot = await db.collection("Consultations").where("doctorId", "==", Number(doctorId)).get();
+      const snapshot = await db.collection("Consultations").where("userId", "==", Number(userId)).get();
       const list = await Promise.all(
         snapshot.docs.map(async (doc) => {
           const data = doc.data();
@@ -80,10 +80,16 @@ const ConsultationRead = {
           const doctorSnapshot = await doctorDocRef.get();
           const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
 
+          // Fetch doctor name
+          const serviceRegistrationFormDocRef = db.collection("ServiceRegistrationForms").where("serviceRegistrationFormId", "==", data.serviceRegistrationFormId);
+          const serviceRegistrationFormSnapshot = await serviceRegistrationFormDocRef.get();
+          const complaint = !serviceRegistrationFormSnapshot.empty ? serviceRegistrationFormSnapshot.docs[0].data().complaint : "";
+
           return {
             consultationId: data.consultationId || null,
             serviceRegistrationFormId: data.serviceRegistrationFormId,
             visitType: data.visitType || "",
+            complaint: complaint,
             doctorId: data.doctorId,
             doctorName: doctorName,
             userId: data.userId,
@@ -130,10 +136,16 @@ const ConsultationRead = {
           const doctorSnapshot = await doctorDocRef.get();
           const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
 
+          // Fetch doctor name
+          const serviceRegistrationFormDocRef = db.collection("ServiceRegistrationForms").where("serviceRegistrationFormId", "==", data.serviceRegistrationFormId);
+          const serviceRegistrationFormSnapshot = await serviceRegistrationFormDocRef.get();
+          const complaint = !serviceRegistrationFormSnapshot.empty ? serviceRegistrationFormSnapshot.docs[0].data().complaint : "";
+
           return {
             consultationId: data.consultationId || null,
             serviceRegistrationFormId: data.serviceRegistrationFormId,
             visitType: data.visitType || "",
+            complaint: complaint,
             doctorId: data.doctorId,
             doctorName: doctorName,
             userId: data.userId,
