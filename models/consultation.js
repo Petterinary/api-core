@@ -100,14 +100,18 @@ const ConsultationRead = {
             .collection("Doctors")
             .where("doctorId", "==", data.doctorId);
           const doctorSnapshot = await doctorDocRef.get();
-          const doctorName = !doctorSnapshot.empty
-            ? doctorSnapshot.docs[0].data().name
-            : "";
+          const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
+
+          // Fetch complaint
+          const serviceRegistrationFormDocRef = db.collection("ServiceRegistrationForms").where("serviceRegistrationFormId", "==", data.serviceRegistrationFormId);
+          const serviceRegistrationFormSnapshot = await serviceRegistrationFormDocRef.get();
+          const complaint = !serviceRegistrationFormSnapshot.empty ? serviceRegistrationFormSnapshot.docs[0].data().complaint : "";
 
           return {
             consultationId: data.consultationId || null,
             serviceRegistrationFormId: data.serviceRegistrationFormId,
             visitType: data.visitType || "",
+            complaint: complaint,
             doctorId: data.doctorId,
             doctorName: doctorName,
             userId: data.userId,
@@ -167,10 +171,16 @@ const ConsultationRead = {
             ? doctorSnapshot.docs[0].data().name
             : "";
 
+          // Fetch complaint
+          const serviceRegistrationFormDocRef = db.collection("ServiceRegistrationForms").where("serviceRegistrationFormId", "==", data.serviceRegistrationFormId);
+          const serviceRegistrationFormSnapshot = await serviceRegistrationFormDocRef.get();
+          const complaint = !serviceRegistrationFormSnapshot.empty ? serviceRegistrationFormSnapshot.docs[0].data().complaint : "";
+
           return {
             consultationId: data.consultationId || null,
             serviceRegistrationFormId: data.serviceRegistrationFormId,
             visitType: data.visitType || "",
+            complaint: complaint,
             doctorId: data.doctorId,
             doctorName: doctorName,
             userId: data.userId,
