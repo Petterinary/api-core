@@ -4,7 +4,10 @@ const db = require("../firebaseAdmin");
 const ConsultationRead = {
   getConsultation: async () => {
     try {
-      const snapshot = await db.collection("Consultations").orderBy("consultationId", "asc").get();
+      const snapshot = await db
+        .collection("Consultations")
+        .orderBy("consultationId", "asc")
+        .get();
       const list = await Promise.all(
         snapshot.docs.map(async (doc) => {
           const data = doc.data();
@@ -21,14 +24,22 @@ const ConsultationRead = {
           }
 
           // Fetch user name
-          const userDocRef = db.collection("Users").where("userId", "==", data.userId);
+          const userDocRef = db
+            .collection("Users")
+            .where("userId", "==", data.userId);
           const userSnapshot = await userDocRef.get();
-          const userName = !userSnapshot.empty ? userSnapshot.docs[0].data().username : "";
+          const userName = !userSnapshot.empty
+            ? userSnapshot.docs[0].data().username
+            : "";
 
           // Fetch doctor name
-          const doctorDocRef = db.collection("Doctors").where("doctorId", "==", data.doctorId);
+          const doctorDocRef = db
+            .collection("Doctors")
+            .where("doctorId", "==", data.doctorId);
           const doctorSnapshot = await doctorDocRef.get();
-          const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
+          const doctorName = !doctorSnapshot.empty
+            ? doctorSnapshot.docs[0].data().name
+            : "";
 
           return {
             consultationId: data.consultationId || null,
@@ -49,13 +60,18 @@ const ConsultationRead = {
       return list;
     } catch (error) {
       console.error("Error fetching consultations by userId:", error);
-      throw new Error("Failed to fetch consultations by userId: " + error.message);
+      throw new Error(
+        "Failed to fetch consultations by userId: " + error.message
+      );
     }
   },
 
   getConsultationsByUserId: async (userId) => {
     try {
-      const snapshot = await db.collection("Consultations").where("userId", "==", Number(userId)).get();
+      const snapshot = await db
+        .collection("Consultations")
+        .where("userId", "==", Number(userId))
+        .get();
       const list = await Promise.all(
         snapshot.docs.map(async (doc) => {
           const data = doc.data();
@@ -71,12 +87,18 @@ const ConsultationRead = {
           }
 
           // Fetch user name
-          const userDocRef = db.collection("Users").where("userId", "==", data.userId);
+          const userDocRef = db
+            .collection("Users")
+            .where("userId", "==", data.userId);
           const userSnapshot = await userDocRef.get();
-          const userName = !userSnapshot.empty ? userSnapshot.docs[0].data().username : "";
+          const userName = !userSnapshot.empty
+            ? userSnapshot.docs[0].data().username
+            : "";
 
           // Fetch doctor name
-          const doctorDocRef = db.collection("Doctors").where("doctorId", "==", data.doctorId);
+          const doctorDocRef = db
+            .collection("Doctors")
+            .where("doctorId", "==", data.doctorId);
           const doctorSnapshot = await doctorDocRef.get();
           const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
 
@@ -105,13 +127,18 @@ const ConsultationRead = {
       return list;
     } catch (error) {
       console.error("Error fetching consultations by userId:", error);
-      throw new Error("Failed to fetch consultations by userId: " + error.message);
+      throw new Error(
+        "Failed to fetch consultations by userId: " + error.message
+      );
     }
   },
 
   getConsultationsByDoctorId: async (doctorId) => {
     try {
-      const snapshot = await db.collection("Consultations").where("doctorId", "==", Number(doctorId)).get();
+      const snapshot = await db
+        .collection("Consultations")
+        .where("doctorId", "==", Number(doctorId))
+        .get();
 
       const list = await Promise.all(
         snapshot.docs.map(async (doc) => {
@@ -127,14 +154,22 @@ const ConsultationRead = {
           }
 
           // Fetch user name
-          const userDocRef = db.collection("Users").where("userId", "==", data.userId);
+          const userDocRef = db
+            .collection("Users")
+            .where("userId", "==", data.userId);
           const userSnapshot = await userDocRef.get();
-          const userName = !userSnapshot.empty ? userSnapshot.docs[0].data().username : "";
+          const userName = !userSnapshot.empty
+            ? userSnapshot.docs[0].data().username
+            : "";
 
           // Fetch doctor name
-          const doctorDocRef = db.collection("Doctors").where("doctorId", "==", data.doctorId);
+          const doctorDocRef = db
+            .collection("Doctors")
+            .where("doctorId", "==", data.doctorId);
           const doctorSnapshot = await doctorDocRef.get();
-          const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
+          const doctorName = !doctorSnapshot.empty
+            ? doctorSnapshot.docs[0].data().name
+            : "";
 
           // Fetch doctor name
           const serviceRegistrationFormDocRef = db.collection("ServiceRegistrationForms").where("serviceRegistrationFormId", "==", data.serviceRegistrationFormId);
@@ -161,13 +196,18 @@ const ConsultationRead = {
       return list;
     } catch (error) {
       console.error("Error fetching consultations by doctorId:", error);
-      throw new Error("Failed to fetch consultations by doctorId: " + error.message);
+      throw new Error(
+        "Failed to fetch consultations by doctorId: " + error.message
+      );
     }
   },
 
   getDetailedConsultation: async (idConsultation) => {
     try {
-      const snapshot = await db.collection("Consultations").where("consultationId", "==", consultationId).get();
+      const snapshot = await db
+        .collection("Consultations")
+        .where("consultationId", "==", consultationId)
+        .get();
       const list = await Promise.all(
         snapshot.docs.map(async (doc) => {
           const data = doc.data();
@@ -184,14 +224,22 @@ const ConsultationRead = {
           }
 
           // Fetch user name
-          const userDocRef = db.collection("Users").where("userId", "==", data.userId);
+          const userDocRef = db
+            .collection("Users")
+            .where("userId", "==", data.userId);
           const userSnapshot = await userDocRef.get();
-          const userName = !userSnapshot.empty ? userSnapshot.docs[0].data().username : "";
+          const userName = !userSnapshot.empty
+            ? userSnapshot.docs[0].data().username
+            : "";
 
           // Fetch doctor name
-          const doctorDocRef = db.collection("Doctors").where("doctorId", "==", data.doctorId);
+          const doctorDocRef = db
+            .collection("Doctors")
+            .where("doctorId", "==", data.doctorId);
           const doctorSnapshot = await doctorDocRef.get();
-          const doctorName = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().name : "";
+          const doctorName = !doctorSnapshot.empty
+            ? doctorSnapshot.docs[0].data().name
+            : "";
 
           return {
             consultationId: data.consultationId || null,
@@ -212,7 +260,9 @@ const ConsultationRead = {
       return list;
     } catch (error) {
       console.error("Error fetching consultations by doctorId:", error);
-      throw new Error("Failed to fetch consultations by doctorId: " + error.message);
+      throw new Error(
+        "Failed to fetch consultations by doctorId: " + error.message
+      );
     }
   },
 };
@@ -251,7 +301,10 @@ const ConsultationWrite = {
 
   updateConsultationById: async (idConsultation, newData) => {
     try {
-      const querySnapshot = await db.collection("Consultations").where("idConsultation", "==", parseInt(idConsultation)).get();
+      const querySnapshot = await db
+        .collection("Consultations")
+        .where("idConsultation", "==", parseInt(idConsultation))
+        .get();
       if (querySnapshot.empty) {
         throw new Error("Consultation not found");
       }
@@ -268,7 +321,10 @@ const ConsultationWrite = {
 
   deleteConsultationById: async (idConsultation) => {
     try {
-      const querySnapshot = await db.collection("Consultations").where("idConsultation", "==", parseInt(idConsultation)).get();
+      const querySnapshot = await db
+        .collection("Consultations")
+        .where("idConsultation", "==", parseInt(idConsultation))
+        .get();
       if (querySnapshot.empty) {
         throw new Error("Consultation not found");
       }
