@@ -202,11 +202,11 @@ const ConsultationRead = {
     }
   },
 
-  getDetailedConsultation: async (idConsultation) => {
+  getDetailedConsultation: async (consultationId) => {
     try {
       const snapshot = await db
         .collection("Consultations")
-        .where("consultationId", "==", consultationId)
+        .where("consultationId", "==", Number(consultationId))
         .get();
       const list = await Promise.all(
         snapshot.docs.map(async (doc) => {
