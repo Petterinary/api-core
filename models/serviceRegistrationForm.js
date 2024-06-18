@@ -183,11 +183,37 @@ const ServiceRegistrationFormWrite = {
 
       await newConsultationRef.set(newConsultationData);
 
+      const counterRef3 = db.collection("LiveTrackingCounter").doc("liveTrackingCounter");
+      const counterDoc3 = await counterRef3.get();
+
+      let newCount3;
+      if (!counterDoc3.exists) {
+        await counterRef3.set({ count: 1 });
+        newCount3 = 1;
+      } else {
+        const currentCount = counterDoc3.data().count || 0;
+        newCount3 = currentCount + 1;
+        await counterRef3.update({ count: newCount3 });
+      }
+
+      const newLiveTrackingRef = db.collection("LiveTrackings").doc();
+      const newLiveTrackingData = {
+        consultationId: newCount3,
+        liveTrackingId: newCount,
+        doctorId,
+        userId,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      };
+
+      await newLiveTrackingRef.set(newLiveTrackingData);
+
       return {
         serviceRegistrationFormId: newCount,
         consultationId: newCount2,
         ...newServiceRegistrationFormData,
         ...newConsultationData,
+        ...newLiveTrackingData,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
