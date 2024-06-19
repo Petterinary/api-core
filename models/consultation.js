@@ -123,7 +123,6 @@ const ConsultationRead = {
             userName: userName,
             userGender: userGender,
             stageStatus: data.stageStatus,
-            passStatus: data.passStatus,
             paymentStatus: data.paymentStatus,
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
@@ -201,7 +200,6 @@ const ConsultationRead = {
             userName: userName,
             userGender: userGender,
             stageStatus: data.stageStatus,
-            passStatus: data.passStatus,
             paymentStatus: data.paymentStatus,
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
@@ -266,7 +264,6 @@ const ConsultationRead = {
             userId: data.userId,
             userName: userName,
             stageStatus: data.stageStatus,
-            passStatus: data.passStatus,
             paymentStatus: data.paymentStatus,
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
@@ -318,21 +315,29 @@ const ConsultationWrite = {
 
   updateConsultationById: async (consultationId, newData) => {
     try {
-      const querySnapshot = await db
-        .collection("Consultations")
-        .where("consultationId", "==", parseInt(consultationId))
-        .get();
-      if (querySnapshot.empty) {
-        throw new Error("Consultation not found");
-      }
-      const doc = querySnapshot.docs[0];
+        const querySnapshot = await db
+            .collection("Consultations")
+            .where("consultationId", "==", parseInt(consultationId))
+            .get();
 
-      newData.updatedAt = FieldValue.serverTimestamp();
+        if (querySnapshot.empty) {
+            throw new Error("Consultation not found");
+        }
 
-      await db.collection("Consultations").doc(doc.id).update(newData);
-      return { msg: "Consultation updated" };
+        const doc = querySnapshot.docs[0];
+
+        const updateData = {};
+        for (const key in newData) {
+            if (newData[key] !== undefined) {
+                updateData[key] = newData[key];
+            }
+        }
+        updateData.updatedAt = FieldValue.serverTimestamp();
+
+        await db.collection("Consultations").doc(doc.id).update(updateData);
+        return { msg: "Consultation updated" };
     } catch (error) {
-      throw new Error("Failed to update consultation: " + error.message);
+        throw new Error("Failed to update consultation: " + error.message);
     }
   },
 

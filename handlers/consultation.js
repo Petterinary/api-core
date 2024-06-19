@@ -41,19 +41,19 @@ const getDetailedConsultation = async (req, res) => {
 
 const createConsultation = async (req, res) => {
   const {
-    idConsultation,
+    consultationId,
     stageStatus,
-    idUser,
-    idDoctor,
-    idRegistrationForm,
+    userId,
+    doctorId,
+    serviceRegistrationFormId,
   } = req.body;
   try {
     const newConsultation = await Consultation.ConsultationWrite.createConsultation({
-      idConsultation,
+      consultationId,
       stageStatus,
-      idUser,
-      idDoctor,
-      idRegistrationForm,
+      userId,
+      doctorId,
+      serviceRegistrationFormId,
     });
     res.status(201).json(newConsultation);
   } catch (error) {
@@ -63,15 +63,16 @@ const createConsultation = async (req, res) => {
 
 const updateConsultationById = async (req, res) => {
   const { consultationId } = req.params;
-  const { stageStatus, passStatus, idUser, idDoctor, idRegistrationForm } = req.body;
+  const { stageStatus, userId, doctorId, serviceRegistrationFormId } = req.body;
+
+  const updateData = {};
+  if (stageStatus !== undefined) updateData.stageStatus = stageStatus;
+  if (userId !== undefined) updateData.userId = userId;
+  if (doctorId !== undefined) updateData.doctorId = doctorId;
+  if (serviceRegistrationFormId !== undefined) updateData.serviceRegistrationFormId = serviceRegistrationFormId;
+
   try {
-    const updatedConsultation = await Consultation.ConsultationWrite.updateConsultationById(consultationId, {
-      stageStatus,
-      passStatus,
-      idUser,
-      idDoctor,
-      idRegistrationForm,
-    });
+    const updatedConsultation = await Consultation.ConsultationWrite.updateConsultationById(consultationId, updateData);
     res.json(updatedConsultation);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -79,9 +80,9 @@ const updateConsultationById = async (req, res) => {
 };
 
 const deleteConsultationById = async (req, res) => {
-  const { idConsultation } = req.params;
+  const { consultationId } = req.params;
   try {
-    await Consultation.ConsultationWrite.deleteConsultationById(idConsultation);
+    await Consultation.ConsultationWrite.deleteConsultationById(consultationId);
     res.json({ message: "Consultation deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });

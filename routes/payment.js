@@ -3,9 +3,9 @@ const router = express.Router();
 const paymentHandlers = require("../handlers/payment");
 
 router.get("/", paymentHandlers.getAllPayments);
-router.get("/:paymentID", paymentHandlers.getPaymentById);
+router.get("/:paymentId", paymentHandlers.getPaymentById);
 router.post("/create", paymentHandlers.createPayment);
-router.patch("/update/:paymentID", paymentHandlers.updatePaymentById);
-router.delete("/delete/:paymentID", paymentHandlers.deletePaymentById);
+router.patch("/update/:paymentId", paymentHandlers.updatePaymentById);
+router.delete("/delete/:paymentId", paymentHandlers.deletePaymentById);
 
 module.exports = router;

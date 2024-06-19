@@ -21,9 +21,9 @@ const getAllPayments = async (req, res) => {
 };
 
 const getPaymentById = async (req, res) => {
-  const { paymentID } = req.params;
+  const { paymentId } = req.params;
   try {
-    const payment = await Payment.PaymentRead.getPaymentById(paymentID);
+    const payment = await Payment.PaymentRead.getPaymentById(paymentId);
     const convertedPayment = {
       ...payment,
       createdAt: payment.createdAt ? convertToIndonesianTime(payment.createdAt) : null,
@@ -59,30 +59,28 @@ const createPayment = async (req, res) => {
 };
 
 const updatePaymentById = async (req, res) => {
-  const { paymentID } = req.params;
+  const { paymentId } = req.params;
   const { paymentMethod, consultationAmount, serviceAmount, transportAmount, paymentStatus } = req.body;
+
+  const updateData = {};
+  if (paymentMethod !== undefined) updateData.paymentMethod = paymentMethod;
+  if (consultationAmount !== undefined) updateData.consultationAmount = consultationAmount;
+  if (serviceAmount !== undefined) updateData.serviceAmount = serviceAmount;
+  if (transportAmount !== undefined) updateData.transportAmount = transportAmount;
+  if (paymentStatus !== undefined) updateData.paymentStatus = paymentStatus;
+
   try {
-    const updatedPayment = await Payment.PaymentWrite.updatePaymentById(paymentID, {
-      paymentMethod,
-      consultationAmount,
-      serviceAmount,
-      transportAmount,
-      paymentStatus
-    });
-    const convertedPayment = {
-      ...updatedPayment,
-      updatedAt: convertToIndonesianTime(updatedPayment.updatedAt)
-    };
-    res.json(convertedPayment);
+    const updatedPayment = await Payment.PaymentWrite.updatePaymentById(paymentId, updateData);
+    res.json(updatedPayment);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 const deletePaymentById = async (req, res) => {
-  const { paymentID } = req.params;
+  const { paymentId } = req.params;
   try {
-    await Payment.PaymentWrite.deletePaymentById(paymentID);
+    await Payment.PaymentWrite.deletePaymentById(paymentId);
     res.json({ message: "Payment hidden successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
