@@ -87,6 +87,13 @@ const ServiceRegistrationFormRead = {
       }
 
       const registrationData = snapshot.docs[0].data();
+
+      const userDocRef = db
+        .collection("Users")
+        .where("userId", "==", registrationData.userId);
+        const userSnapshot = await userDocRef.get();
+        const userPhoneNumber = !userSnapshot.empty ? userSnapshot.docs[0].data().phoneNumber: "";
+
       return {
         serviceRegistrationFormId: registrationData.serviceRegistrationFormId || null,
         registrationDate: registrationData.registrationDate ? registrationData.registrationDate.toDate() : null,
@@ -96,6 +103,7 @@ const ServiceRegistrationFormRead = {
         petName: registrationData.petName || "",
         petType: registrationData.petType || "",
         complaint: registrationData.complaint || "",
+        userPhoneNumber: userPhoneNumber,
         visitType: registrationData.visitType || 0,
         createdAt: registrationData.createdAt ? registrationData.createdAt.toDate() : null,
         updatedAt: registrationData.updatedAt ? registrationData.updatedAt.toDate() : null,
