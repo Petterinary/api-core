@@ -124,6 +124,7 @@ const ConsultationRead = {
             userGender: userGender,
             stageStatus: data.stageStatus,
             passStatus: data.passStatus,
+            paymentStatus: data.paymentStatus,
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
           };
@@ -201,6 +202,7 @@ const ConsultationRead = {
             userGender: userGender,
             stageStatus: data.stageStatus,
             passStatus: data.passStatus,
+            paymentStatus: data.paymentStatus,
             createdAt: data.createdAt ? data.createdAt.toDate() : null,
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
           };

@@ -177,6 +177,7 @@ const ServiceRegistrationFormWrite = {
         serviceRegistrationFormId: newCount,
         stageStatus: 0,
         passStatus: 0,
+        paymentStatus: 0,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       };
