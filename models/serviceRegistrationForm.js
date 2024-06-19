@@ -81,7 +81,7 @@ const ServiceRegistrationFormRead = {
 
   getServiceRegistrationFormById: async (serviceRegistrationFormId) => {
     try {
-      const snapshot = await db.collection("ServiceRegistrationForms").where("doctorId", "==", Number(serviceRegistrationFormId)).get();
+      const snapshot = await db.collection("ServiceRegistrationForms").where("serviceRegistrationFormId", "==", Number(serviceRegistrationFormId)).get();
       if (snapshot.empty) {
         return null;
       }

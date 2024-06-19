@@ -21,7 +21,7 @@ const getAllServiceRegistrationForms = async (req, res) => {
 
 const getServiceRegistrationFormById = async (req, res) => {
   try {
-    const { serviceRegistrationFormId } = req.params; // Ensure you're correctly extracting serviceRegistrationFormId from req.params
+    const { serviceRegistrationFormId } = req.params;
     if (!serviceRegistrationFormId) {
       throw new Error("Missing serviceRegistrationFormId parameter.");
     }
