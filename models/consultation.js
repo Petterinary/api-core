@@ -44,6 +44,7 @@ const ConsultationRead = {
           return {
             consultationId: data.consultationId || null,
             serviceRegistrationFormId: data.serviceRegistrationFormId,
+            paymentId: data.paymentId,
             visitType: data.visitType || "",
             doctorId: data.doctorId,
             doctorName: doctorName,
@@ -114,6 +115,7 @@ const ConsultationRead = {
           return {
             consultationId: data.consultationId || null,
             serviceRegistrationFormId: data.serviceRegistrationFormId,
+            paymentId: data.paymentId,
             visitType: data.visitType || "",
             complaint: complaint,
             doctorId: data.doctorId,
@@ -191,6 +193,7 @@ const ConsultationRead = {
           return {
             consultationId: data.consultationId || null,
             serviceRegistrationFormId: data.serviceRegistrationFormId,
+            paymentId: data.paymentId,
             visitType: data.visitType || "",
             complaint: complaint,
             doctorId: data.doctorId,
@@ -258,6 +261,7 @@ const ConsultationRead = {
           return {
             consultationId: data.consultationId || null,
             serviceRegistrationFormId: data.serviceRegistrationFormId,
+            paymentId: data.paymentId,
             visitType: data.visitType || "",
             doctorId: data.doctorId,
             doctorName: doctorName,
