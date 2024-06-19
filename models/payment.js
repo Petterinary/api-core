@@ -5,7 +5,6 @@ const PaymentRead = {
   getAllPayments: async () => {
     try {
       const snapshot = await db.collection("Payments")
-        .where("visible", "==", 1)
         .orderBy("paymentId", "asc")
         .get();
       const list = snapshot.docs.map((doc) => {
@@ -18,7 +17,6 @@ const PaymentRead = {
           transportAmount: data.transportAmount || 0,
           totalAmount: data.totalAmount || 0,
           paymentStatus: data.paymentStatus || 0,
-          visible: data.visible || 1,
           createdAt: data.createdAt ? data.createdAt.toDate() : null,
           updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
         };
@@ -28,11 +26,10 @@ const PaymentRead = {
       throw new Error("Failed to fetch payments: " + error.message);
     }
   },
-  getPaymentById: async (paymentID) => {
+  getPaymentById: async (paymentId) => {
     try {
       const querySnapshot = await db.collection("Payments")
-        .where("paymentId", "==", parseInt(paymentID))
-        .where("visible", "==", 1)
+        .where("paymentId", "==", Number(paymentId))
         .get();
       if (querySnapshot.empty) {
         throw new Error("Payment not found");
@@ -47,7 +44,6 @@ const PaymentRead = {
         transportAmount: data.transportAmount || 0,
         totalAmount: data.totalAmount || 0,
         paymentStatus: data.paymentStatus || 0,
-        visible: data.visible || 1,
         createdAt: data.createdAt ? data.createdAt.toDate() : null,
         updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
       };
@@ -102,35 +98,31 @@ const PaymentWrite = {
     }
   },
 
-  updatePaymentById: async (paymentID, newData) => {
+  updatePaymentById: async (paymentId, newData) => {
     try {
-      const querySnapshot = await db.collection("Payments").where("paymentId", "==", parseInt(paymentID)).get();
-      if (querySnapshot.empty) {
-        throw new Error("Payment not found");
-      }
-      const doc = querySnapshot.docs[0];
+        const querySnapshot = await db
+            .collection("Payments")
+            .where("paymentId", "==", parseInt(paymentId))
+            .get();
+        if (querySnapshot.empty) {
+            throw new Error("Payment not found");
+        }
+        const doc = querySnapshot.docs[0];
 
-      if (newData.consultationAmount !== undefined && newData.serviceAmount !== undefined) {
-        newData.totalAmount = parseInt(newData.consultationAmount) + parseInt(newData.serviceAmount);
-      }
+        const consultationAmount = parseInt(newData.consultationAmount || doc.data().consultationAmount || 0);
+        const serviceAmount = parseInt(newData.serviceAmount || doc.data().serviceAmount || 0);
+        const transportAmount = parseInt(newData.transportAmount || doc.data().transportAmount || 0);
 
-      newData.updatedAt = FieldValue.serverTimestamp();
+        const totalAmount = consultationAmount + serviceAmount + transportAmount;
 
-      // Filter out undefined values
-      const validData = Object.fromEntries(Object.entries(newData).filter(([_, v]) => v !== undefined));
+        newData.updatedAt = FieldValue.serverTimestamp();
 
-      await db.collection("Payments").doc(doc.id).update(validData);
+        newData.totalAmount = totalAmount;
 
-      // Fetch the updated document
-      const updatedDoc = await db.collection("Payments").doc(doc.id).get();
-      const updatedData = updatedDoc.data();
-
-      return {
-        msg: "Payment updated",
-        updatedAt: updatedData.updatedAt ? updatedData.updatedAt.toDate() : null
-      };
+        await db.collection("Payments").doc(doc.id).update(newData);
+        return { msg: "Payment updated" };
     } catch (error) {
-      throw new Error("Failed to update payment: " + error.message);
+        throw new Error("Failed to update payment: " + error.message);
     }
   },
 

@@ -126,14 +126,11 @@ const ServiceRegistrationFormWrite = {
       const counterRef = db.collection("ServiceRegistrationFormCounter").doc("serviceRegistrationFormCounter");
       const counterDoc = await counterRef.get();
 
-      let newCount;
-      if (!counterDoc.exists) {
-        await counterRef.set({ count: 1 });
-        newCount = 1;
-      } else {
-        const currentCount = counterDoc.data().count || 0;
-        newCount = currentCount + 1;
+      let newCount = counterDoc.exists ? counterDoc.data().count + 1 : 1;
+      if (counterDoc.exists) {
         await counterRef.update({ count: newCount });
+      } else {
+        await counterRef.set({ count: newCount });
       }
 
       const newServiceRegistrationFormRef = db.collection("ServiceRegistrationForms").doc();
@@ -155,28 +152,50 @@ const ServiceRegistrationFormWrite = {
 
       await newServiceRegistrationFormRef.set(newServiceRegistrationFormData);
 
-      const counterRef2 = db.collection("ConsultationCounter").doc("consultationCounter");
-      const counterDoc2 = await counterRef2.get();
+      const counterRefPayment = db.collection("PaymentCounter").doc("paymentCounter");
+      const counterDocPayment = await counterRefPayment.get();
 
-      let newCount2;
-      if (!counterDoc2.exists) {
-        await counterRef2.set({ count: 1 });
-        newCount2 = 1;
+      let newCountPayment = counterDocPayment.exists ? counterDocPayment.data().count + 1 : 1;
+      if (counterDocPayment.exists) {
+        await counterRefPayment.update({ count: newCountPayment });
       } else {
-        const currentCount = counterDoc2.data().count || 0;
-        newCount2 = currentCount + 1;
-        await counterRef2.update({ count: newCount2 });
+        await counterRefPayment.set({ count: newCountPayment });
+      }
+
+      const newPaymentRef = db.collection("Payments").doc();
+      const newPaymentData = {
+        paymentId: newCountPayment,
+        paymentMethod: "",
+        consultationAmount: 0,
+        serviceAmount: 0,
+        transportAmount: 0,
+        totalAmount: 0,
+        paymentStatus: 0,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      };
+
+      await newPaymentRef.set(newPaymentData);
+
+      const counterRefConsultation = db.collection("ConsultationCounter").doc("consultationCounter");
+      const counterDocConsultation = await counterRefConsultation.get();
+
+      let newCountConsultation = counterDocConsultation.exists ? counterDocConsultation.data().count + 1 : 1;
+      if (counterDocConsultation.exists) {
+        await counterRefConsultation.update({ count: newCountConsultation });
+      } else {
+        await counterRefConsultation.set({ count: newCountConsultation });
       }
 
       const newConsultationRef = db.collection("Consultations").doc();
       const newConsultationData = {
-        consultationId: newCount2,
+        consultationId: newCountConsultation,
+        paymentId: newCountPayment,
         visitType,
-        userId: userId,
-        doctorId: doctorId,
+        userId,
+        doctorId,
         serviceRegistrationFormId: newCount,
         stageStatus: 0,
-        passStatus: 0,
         paymentStatus: 0,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
@@ -184,23 +203,21 @@ const ServiceRegistrationFormWrite = {
 
       await newConsultationRef.set(newConsultationData);
 
-      const counterRef3 = db.collection("LiveTrackingCounter").doc("liveTrackingCounter");
-      const counterDoc3 = await counterRef3.get();
+      // Create Live Tracking
+      const counterRefLiveTracking = db.collection("LiveTrackingCounter").doc("liveTrackingCounter");
+      const counterDocLiveTracking = await counterRefLiveTracking.get();
 
-      let newCount3;
-      if (!counterDoc3.exists) {
-        await counterRef3.set({ count: 1 });
-        newCount3 = 1;
+      let newCountLiveTracking = counterDocLiveTracking.exists ? counterDocLiveTracking.data().count + 1 : 1;
+      if (counterDocLiveTracking.exists) {
+        await counterRefLiveTracking.update({ count: newCountLiveTracking });
       } else {
-        const currentCount = counterDoc3.data().count || 0;
-        newCount3 = currentCount + 1;
-        await counterRef3.update({ count: newCount3 });
+        await counterRefLiveTracking.set({ count: newCountLiveTracking });
       }
 
       const newLiveTrackingRef = db.collection("LiveTrackings").doc();
       const newLiveTrackingData = {
-        consultationId: newCount3,
-        liveTrackingId: newCount,
+        consultationId: newCountConsultation,
+        liveTrackingId: newCountLiveTracking,
         doctorId,
         userId,
         createdAt: FieldValue.serverTimestamp(),
@@ -211,9 +228,12 @@ const ServiceRegistrationFormWrite = {
 
       return {
         serviceRegistrationFormId: newCount,
-        consultationId: newCount2,
         ...newServiceRegistrationFormData,
+        paymentId: newCountPayment,
+        ...newPaymentData,
+        consultationId: newCountConsultation,
         ...newConsultationData,
+        liveTrackingId: newCountLiveTracking,
         ...newLiveTrackingData,
         createdAt: new Date(),
         updatedAt: new Date(),
