@@ -94,9 +94,16 @@ const ServiceRegistrationFormRead = {
         const userSnapshot = await userDocRef.get();
         const userPhoneNumber = !userSnapshot.empty ? userSnapshot.docs[0].data().phoneNumber: "";
 
+      const doctorDocRef = db
+        .collection("Users")
+        .where("userId", "==", registrationData.userId);
+        const doctorSnapshot = await doctorDocRef.get();
+        const doctorAddress = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().address: "";
+
       return {
         serviceRegistrationFormId: registrationData.serviceRegistrationFormId || null,
         registrationDate: registrationData.registrationDate ? registrationData.registrationDate.toDate() : null,
+        doctorAddress: doctorAddress,
         address: registrationData.address || "",
         lat: registrationData.lat || "",
         lng: registrationData.lng || "",
