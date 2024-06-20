@@ -131,7 +131,7 @@ const PaymentWrite = {
         if (!consultationSnapshot.empty) {
           const consultationDoc = consultationSnapshot.docs[0];
           await db.collection("Consultations").doc(consultationDoc.id).update({
-            stageStatus: 2,
+            stageStatus: 3,
             updatedAt: FieldValue.serverTimestamp(),
           });
         }
