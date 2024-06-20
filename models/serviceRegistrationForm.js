@@ -95,8 +95,8 @@ const ServiceRegistrationFormRead = {
         const userPhoneNumber = !userSnapshot.empty ? userSnapshot.docs[0].data().phoneNumber: "";
 
       const doctorDocRef = db
-        .collection("Users")
-        .where("userId", "==", registrationData.userId);
+        .collection("Doctors")
+        .where("doctorId", "==", registrationData.doctorId);
         const doctorSnapshot = await doctorDocRef.get();
         const doctorAddress = !doctorSnapshot.empty ? doctorSnapshot.docs[0].data().address: "";
 
