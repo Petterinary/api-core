@@ -100,29 +100,46 @@ const PaymentWrite = {
 
   updatePaymentById: async (paymentId, newData) => {
     try {
-        const querySnapshot = await db
-            .collection("Payments")
-            .where("paymentId", "==", parseInt(paymentId))
-            .get();
-        if (querySnapshot.empty) {
-            throw new Error("Payment not found");
+      const paymentSnapshot = await db
+        .collection("Payments")
+        .where("paymentId", "==", parseInt(paymentId))
+        .get();
+
+      if (paymentSnapshot.empty) {
+        throw new Error("Payment not found");
+      }
+
+      const paymentDoc = paymentSnapshot.docs[0];
+      const paymentData = paymentDoc.data();
+
+      const consultationAmount = parseInt(newData.consultationAmount ?? paymentData.consultationAmount ?? 0);
+      const serviceAmount = parseInt(newData.serviceAmount ?? paymentData.serviceAmount ?? 0);
+      const transportAmount = parseInt(newData.transportAmount ?? paymentData.transportAmount ?? 0);
+      const totalAmount = consultationAmount + serviceAmount + transportAmount;
+
+      newData.updatedAt = FieldValue.serverTimestamp();
+      newData.totalAmount = totalAmount;
+
+      await db.collection("Payments").doc(paymentDoc.id).update(newData);
+
+      if (newData.paymentStatus === 2) {
+        const consultationSnapshot = await db
+          .collection("Consultations")
+          .where("paymentId", "==", parseInt(paymentId))
+          .get();
+
+        if (!consultationSnapshot.empty) {
+          const consultationDoc = consultationSnapshot.docs[0];
+          await db.collection("Consultations").doc(consultationDoc.id).update({
+            stageStatus: 2,
+            updatedAt: FieldValue.serverTimestamp(),
+          });
         }
-        const doc = querySnapshot.docs[0];
+      }
 
-        const consultationAmount = parseInt(newData.consultationAmount || doc.data().consultationAmount || 0);
-        const serviceAmount = parseInt(newData.serviceAmount || doc.data().serviceAmount || 0);
-        const transportAmount = parseInt(newData.transportAmount || doc.data().transportAmount || 0);
-
-        const totalAmount = consultationAmount + serviceAmount + transportAmount;
-
-        newData.updatedAt = FieldValue.serverTimestamp();
-
-        newData.totalAmount = totalAmount;
-
-        await db.collection("Payments").doc(doc.id).update(newData);
-        return { msg: "Payment updated" };
+      return { msg: "Payment updated" };
     } catch (error) {
-        throw new Error("Failed to update payment: " + error.message);
+      throw new Error("Failed to update payment: " + error.message);
     }
   },
 
