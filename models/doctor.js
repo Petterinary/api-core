@@ -1,8 +1,39 @@
 const db = require("../firebaseAdmin");
 
+function toRadians(degrees) {
+  return degrees * (Math.PI / 180);
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const lat1Rad = toRadians(lat1);
+  const lon1Rad = toRadians(lon1);
+  const lat2Rad = toRadians(lat2);
+  const lon2Rad = toRadians(lon2);
+
+  const dLat = lat2Rad - lat1Rad;
+  const dLon = lon2Rad - lon1Rad;
+
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c;
+
+  return distance;
+}
+
 const DoctorRead = {
   getAllDoctors: async () => {
     try {
+      const userSnapshot = await db.collection("Users").limit(1).get();
+      if (userSnapshot.empty) {
+        throw new Error("User not found");
+      }
+      const userData = userSnapshot.docs[0].data();
+      const userLat = userData.lat;
+      const userLng = userData.lng;
+
       const snapshot = await db
         .collection("Doctors")
         .where("visible", "==", 1)
@@ -18,6 +49,13 @@ const DoctorRead = {
           const accountData = accountSnapshot.empty
             ? {}
             : accountSnapshot.docs[0].data();
+
+          let distance = null;
+
+          if (accountData.lat && accountData.lng) {
+            distance = calculateDistance(userLat, userLng, accountData.lat, accountData.lng);
+          }
+
           return {
             doctorId: data.doctorId || null,
             name: accountData.username || data.name || "",
@@ -31,6 +69,7 @@ const DoctorRead = {
             lat: accountData.lat || "",
             lng: accountData.lng || "",
             visible: data.visible || 1,
+            distance: distance !== null ? Number(distance.toFixed(2)) : null,
           };
         })
       );
