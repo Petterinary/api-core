@@ -23,6 +23,42 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return distance;
 }
 
+function isWithinSchedule(schedule, currentDay, currentTime) {
+  const daysMap = {
+    "Minggu": 0,
+    "Senin": 1,
+    "Selasa": 2,
+    "Rabu": 3,
+    "Kamis": 4,
+    "Jumat": 5,
+    "Sabtu": 6
+  };
+
+  const [daysPart, timePart] = schedule.split(": ");
+  const [startDay, endDay] = daysPart.split(" - ");
+  const [startTime, endTime] = timePart.split(" - ");
+
+  const startDayIndex = daysMap[startDay];
+  const endDayIndex = daysMap[endDay];
+  const startTimeParts = startTime.split(":");
+  const endTimeParts = endTime.split(":");
+  const currentTimeParts = currentTime.split(":");
+
+  const startMinutes = parseInt(startTimeParts[0]) * 60 + parseInt(startTimeParts[1]);
+  const endMinutes = parseInt(endTimeParts[0]) * 60 + parseInt(endTimeParts[1]);
+  const currentMinutes = parseInt(currentTimeParts[0]) * 60 + parseInt(currentTimeParts[1]);
+
+  const isDayWithinRange = (startDayIndex <= endDayIndex)
+    ? (currentDay >= startDayIndex && currentDay <= endDayIndex)
+    : (currentDay >= startDayIndex || currentDay <= endDayIndex);
+
+  const isTimeWithinRange = (endMinutes >= startMinutes)
+    ? (currentMinutes >= startMinutes && currentMinutes <= endMinutes)
+    : (currentMinutes >= startMinutes || currentMinutes <= endMinutes);
+
+  return isDayWithinRange && isTimeWithinRange;
+}
+
 const DoctorRead = {
   getAllDoctors: async () => {
     try {
@@ -39,6 +75,10 @@ const DoctorRead = {
         .where("visible", "==", 1)
         .orderBy("doctorId", "asc")
         .get();
+
+      const currentDay = new Date().getDay();
+      const currentTime = new Date().toTimeString().split(" ")[0].substring(0, 5);
+
       const list = await Promise.all(
         snapshot.docs.map(async (doc) => {
           const data = doc.data();
@@ -56,24 +96,31 @@ const DoctorRead = {
             distance = calculateDistance(userLat, userLng, accountData.lat, accountData.lng);
           }
 
-          return {
-            doctorId: data.doctorId || null,
-            name: accountData.username || data.name || "",
-            phoneNumber: data.phoneNumber || "",
-            address: data.address || "",
-            email: data.email || "",
-            specialization: data.specialization || "",
-            doctorSchedule: data.doctorSchedule || "",
-            experience: data.experience || "",
-            gender: accountData.gender || "",
-            lat: accountData.lat || "",
-            lng: accountData.lng || "",
-            visible: data.visible || 1,
-            distance: distance !== null ? Number(distance.toFixed(2)) : null,
-          };
+          const isAvailable = isWithinSchedule(data.doctorSchedule, currentDay, currentTime);
+
+          if (isAvailable) {
+            return {
+              doctorId: data.doctorId || null,
+              name: accountData.username || data.name || "",
+              phoneNumber: data.phoneNumber || "",
+              address: data.address || "",
+              email: data.email || "",
+              specialization: data.specialization || "",
+              doctorSchedule: data.doctorSchedule || "",
+              experience: data.experience || "",
+              gender: accountData.gender || "",
+              lat: accountData.lat || "",
+              lng: accountData.lng || "",
+              visible: data.visible || 1,
+              distance: distance !== null ? Number(distance.toFixed(2)) : null,
+            };
+          } else {
+            return null;
+          }
         })
       );
-      return list;
+
+      return list.filter(doctor => doctor !== null);
     } catch (error) {
       throw new Error("Failed to fetch doctors: " + error.message);
     }
