@@ -60,16 +60,8 @@ function isWithinSchedule(schedule, currentDay, currentTime) {
 }
 
 const DoctorRead = {
-  getAllDoctors: async () => {
+  getAllDoctors: async (userLat, userLng) => {
     try {
-      const userSnapshot = await db.collection("Users").limit(1).get();
-      if (userSnapshot.empty) {
-        throw new Error("User not found");
-      }
-      const userData = userSnapshot.docs[0].data();
-      const userLat = userData.lat;
-      const userLng = userData.lng;
-
       const snapshot = await db
         .collection("Doctors")
         .where("visible", "==", 1)
