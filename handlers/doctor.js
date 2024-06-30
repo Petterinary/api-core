@@ -2,7 +2,13 @@ const Doctor = require("../models/doctor");
 
 const getAllDoctors = async (req, res) => {
   try {
-    const doctors = await Doctor.DoctorRead.getAllDoctors();
+    const { lat, lng } = req.query;
+
+    if (!lat || !lng) {
+      return res.status(400).json({ error: "lat and lng are required" });
+    }
+
+    const doctors = await Doctor.DoctorRead.getAllDoctors(parseFloat(lat), parseFloat(lng));
     res.json(doctors);
   } catch (error) {
     res.status(500).json({ error: error.message });
