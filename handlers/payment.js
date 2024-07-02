@@ -60,7 +60,7 @@ const createPayment = async (req, res) => {
 
 const updatePaymentById = async (req, res) => {
   const { paymentId } = req.params;
-  const { paymentMethod, consultationAmount, serviceAmount, transportAmount, paymentStatus } = req.body;
+  const { paymentMethod, consultationAmount, serviceAmount, transportAmount, paymentStatus, consultationResult } = req.body;
 
   const updateData = {};
   if (paymentMethod !== undefined) updateData.paymentMethod = paymentMethod;
@@ -68,6 +68,7 @@ const updatePaymentById = async (req, res) => {
   if (serviceAmount !== undefined) updateData.serviceAmount = serviceAmount;
   if (transportAmount !== undefined) updateData.transportAmount = transportAmount;
   if (paymentStatus !== undefined) updateData.paymentStatus = paymentStatus;
+  if (consultationResult !== undefined) updateData.consultationResult = consultationResult;
 
   try {
     const updatedPayment = await Payment.PaymentWrite.updatePaymentById(paymentId, updateData);
