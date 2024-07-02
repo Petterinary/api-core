@@ -212,13 +212,13 @@ const ServiceRegistrationFormWrite = {
         serviceRegistrationFormId: newCount,
         stageStatus: 0,
         paymentStatus: 0,
+        consultationResult: "",
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       };
 
       await newConsultationRef.set(newConsultationData);
 
-      // Create Live Tracking
       const counterRefLiveTracking = db.collection("LiveTrackingCounter").doc("liveTrackingCounter");
       const counterDocLiveTracking = await counterRefLiveTracking.get();
 

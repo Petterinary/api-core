@@ -122,19 +122,26 @@ const PaymentWrite = {
 
       await db.collection("Payments").doc(paymentDoc.id).update(newData);
 
-      if (newData.paymentStatus === 2) {
-        const consultationSnapshot = await db
-          .collection("Consultations")
-          .where("paymentId", "==", parseInt(paymentId))
-          .get();
+      const consultationSnapshot = await db
+        .collection("Consultations")
+        .where("paymentId", "==", parseInt(paymentId))
+        .get();
 
-        if (!consultationSnapshot.empty) {
-          const consultationDoc = consultationSnapshot.docs[0];
-          await db.collection("Consultations").doc(consultationDoc.id).update({
-            stageStatus: 3,
-            updatedAt: FieldValue.serverTimestamp(),
-          });
+      if (!consultationSnapshot.empty) {
+        const consultationDoc = consultationSnapshot.docs[0];
+        const consultationUpdates = {
+          updatedAt: FieldValue.serverTimestamp(),
+        };
+
+        if (newData.consultationResult !== undefined) {
+          consultationUpdates.consultationResult = newData.consultationResult;
         }
+
+        if (newData.paymentStatus === 2) {
+          consultationUpdates.stageStatus = 3;
+        }
+
+        await db.collection("Consultations").doc(consultationDoc.id).update(consultationUpdates);
       }
 
       return { msg: "Payment updated" };
