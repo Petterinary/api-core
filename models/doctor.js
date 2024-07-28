@@ -23,41 +23,41 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return distance;
 }
 
-// function isWithinSchedule(schedule, currentDay, currentTime) {
-//   const daysMap = {
-//     "Minggu": 0,
-//     "Senin": 1,
-//     "Selasa": 2,
-//     "Rabu": 3,
-//     "Kamis": 4,
-//     "Jumat": 5,
-//     "Sabtu": 6
-//   };
+function isWithinSchedule(schedule, currentDay, currentTime) {
+  const daysMap = {
+    "Minggu": 0,
+    "Senin": 1,
+    "Selasa": 2,
+    "Rabu": 3,
+    "Kamis": 4,
+    "Jumat": 5,
+    "Sabtu": 6
+  };
 
-//   const [daysPart, timePart] = schedule.split(": ");
-//   const [startDay, endDay] = daysPart.split(" - ");
-//   const [startTime, endTime] = timePart.split(" - ");
+  const [daysPart, timePart] = schedule.split(": ");
+  const [startDay, endDay] = daysPart.split(" - ");
+  const [startTime, endTime] = timePart.split(" - ");
 
-//   const startDayIndex = daysMap[startDay];
-//   const endDayIndex = daysMap[endDay];
-//   const startTimeParts = startTime.split(":");
-//   const endTimeParts = endTime.split(":");
-//   const currentTimeParts = currentTime.split(":");
+  const startDayIndex = daysMap[startDay];
+  const endDayIndex = daysMap[endDay];
+  const startTimeParts = startTime.split(":");
+  const endTimeParts = endTime.split(":");
+  const currentTimeParts = currentTime.split(":");
 
-//   const startMinutes = parseInt(startTimeParts[0]) * 60 + parseInt(startTimeParts[1]);
-//   const endMinutes = parseInt(endTimeParts[0]) * 60 + parseInt(endTimeParts[1]);
-//   const currentMinutes = parseInt(currentTimeParts[0]) * 60 + parseInt(currentTimeParts[1]);
+  const startMinutes = parseInt(startTimeParts[0]) * 60 + parseInt(startTimeParts[1]);
+  const endMinutes = parseInt(endTimeParts[0]) * 60 + parseInt(endTimeParts[1]);
+  const currentMinutes = parseInt(currentTimeParts[0]) * 60 + parseInt(currentTimeParts[1]);
 
-//   const isDayWithinRange = (startDayIndex <= endDayIndex)
-//     ? (currentDay >= startDayIndex && currentDay <= endDayIndex)
-//     : (currentDay >= startDayIndex || currentDay <= endDayIndex);
+  const isDayWithinRange = (startDayIndex <= endDayIndex)
+    ? (currentDay >= startDayIndex && currentDay <= endDayIndex)
+    : (currentDay >= startDayIndex || currentDay <= endDayIndex);
 
-//   const isTimeWithinRange = (endMinutes >= startMinutes)
-//     ? (currentMinutes >= startMinutes && currentMinutes <= endMinutes)
-//     : (currentMinutes >= startMinutes || currentMinutes <= endMinutes);
+  const isTimeWithinRange = (endMinutes >= startMinutes)
+    ? (currentMinutes >= startMinutes && currentMinutes <= endMinutes)
+    : (currentMinutes >= startMinutes || currentMinutes <= endMinutes);
 
-//   return isDayWithinRange && isTimeWithinRange;
-// }
+  return isDayWithinRange && isTimeWithinRange;
+}
 
 const DoctorRead = {
   getAllDoctors: async (userLat, userLng) => {
@@ -88,9 +88,9 @@ const DoctorRead = {
             distance = calculateDistance(userLat, userLng, accountData.lat, accountData.lng);
           }
 
-          // const isAvailable = isWithinSchedule(data.doctorSchedule, currentDay, currentTime);
+          const isAvailable = isWithinSchedule(data.doctorSchedule, currentDay, currentTime);
 
-          // if (isAvailable) {
+          if (isAvailable) {
             return {
               doctorId: data.doctorId || null,
               name: accountData.username || data.name || "",
@@ -106,9 +106,9 @@ const DoctorRead = {
               visible: data.visible || 1,
               distance: distance !== null ? Number(distance.toFixed(2)) : null,
             };
-          // } else {
-          //   return null;
-          // }
+          } else {
+            return null;
+          }
         })
       );
 
