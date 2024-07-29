@@ -1,4 +1,5 @@
 const db = require("../firebaseAdmin");
+const moment = require("moment-timezone");
 
 function toRadians(degrees) {
   return degrees * (Math.PI / 180);
@@ -68,8 +69,9 @@ const DoctorRead = {
         .orderBy("doctorId", "asc")
         .get();
 
-      const currentDay = new Date().getDay();
-      const currentTime = new Date().toTimeString().split(" ")[0].substring(0, 5);
+      const currentMoment = moment().tz("Asia/Jakarta");
+      const currentDay = currentMoment.day();
+      const currentTime = currentMoment.format("HH:mm");
 
       const list = await Promise.all(
         snapshot.docs.map(async (doc) => {
