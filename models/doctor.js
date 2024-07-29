@@ -24,7 +24,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return distance;
 }
 
-function isWithinSchedule(schedule, currentDay, currentTime) {
+function isWithinSingleSchedule(schedule, currentDay, currentTime) {
   const daysMap = {
     "Minggu": 0,
     "Senin": 1,
@@ -58,6 +58,11 @@ function isWithinSchedule(schedule, currentDay, currentTime) {
     : (currentMinutes >= startMinutes || currentMinutes <= endMinutes);
 
   return isDayWithinRange && isTimeWithinRange;
+}
+
+function isWithinSchedule(scheduleString, currentDay, currentTime) {
+  const schedules = scheduleString.split(", ");
+  return schedules.some(schedule => isWithinSingleSchedule(schedule, currentDay, currentTime));
 }
 
 const DoctorRead = {
